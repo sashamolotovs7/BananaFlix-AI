@@ -6,7 +6,7 @@ import { saveMovieIds, getSavedMovieIds } from '../utils/localStorage';
 import type { Movie } from '../models/Movie';
 import { searchMovies } from '../utils/API';
 
-const API_KEY = 'e6810719cd94c3e532b5975ed70d5830';
+const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 
 const SearchMovies = () => {
   const [searchedMovies, setSearchedMovies] = useState<Movie[]>([]);
