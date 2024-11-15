@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
-// import { createUser } from '../utils/API'; // no longer needed
 import Auth from '../utils/auth';
 // import  User from '../../../server/src/models/User.js'; // change to import the apollo model? - not needed
 

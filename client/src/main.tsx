@@ -7,6 +7,7 @@ import App from './App.jsx'
 // import SearchBooks from './pages/SearchBooks'
 // import SavedBooks from './pages/SavedBooks'
 import Landing from './pages/Landing'
+// import SignupForm from './pages/Signup'
 
 const router = createBrowserRouter([
   {
@@ -19,8 +20,8 @@ const router = createBrowserRouter([
         element: <Landing />
       }, 
       // {
-      //   path: '/saved',
-      //   element: <SavedBooks />
+      //   path: '/signup',
+      //   element: <SignupForm />
       // }
     ]
   }
