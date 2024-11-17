@@ -7,6 +7,7 @@ import App from './App.jsx'
 // import SearchBooks from './pages/SearchBooks'
 // import SavedBooks from './pages/SavedBooks'
 import Landing from './pages/Landing'
+import Trending from './pages/Trending.js'
 // import SignupForm from './pages/Signup'
 
 const router = createBrowserRouter([
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
         index: true,
         element: <Landing />
       }, 
+      {
+        path: '/trending',
+        element: <Trending />
+      }
       // {
       //   path: '/signup',
       //   element: <SignupForm />

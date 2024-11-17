@@ -1,6 +1,5 @@
 import User from '../models/User.js';
-import { AuthenticationError } from 'apollo-server';
-import { signToken } from '../services/auth.js';
+import { AuthenticationError, signToken } from '../services/auth.js';
 
 interface User {
   _id: string;
@@ -10,16 +9,77 @@ interface User {
   movieCount: number;
 }
 
-
 interface Context {
   user?: User;
 }
 
+const TMDB_API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+const BASE_URL = 'https://api.themoviedb.org/3';
 const resolvers = {
   Query: {
     me: async (_: unknown, __: unknown, context: Context) => {
       if (!context.user) throw new AuthenticationError('Could not find user');
       return await User.findOne({ _id: context.user._id });
+    },
+    trendingMovies: async () => {
+      const response = await fetch(
+        `${BASE_URL}/trending/movie/day?language=en-US`,
+        {
+          headers: {
+            Authorization: `Bearer ${TMDB_API_KEY}`,
+          },
+        }
+      );
+      const { results } = await response.json();
+
+      // Transform the data
+      return results.map((movie: any) => ({
+        adult: movie.adult,
+        backdropPath: movie.backdrop_path,
+        genreIds: movie.genre_ids,
+        id: movie.id,
+        originalLanguage: movie.original_language,
+        originalTitle: movie.original_title,
+        overview: movie.overview,
+        popularity: movie.popularity,
+        posterPath: movie.poster_path,
+        releaseDate: movie.release_date,
+        title: movie.title,
+        video: movie.video,
+        voteAverage: movie.vote_average,
+        voteCount: movie.vote_count,
+        mediaType: movie.media_type,
+      }));
+    },
+
+    trendingTVShows: async () => {
+      const response = await fetch(
+        `${BASE_URL}/trending/tv/day?language=en-US'`,
+        {
+          headers: {
+            Authorization: `Bearer ${TMDB_API_KEY}`,
+          },
+        }
+      );
+      const { results } = await response.json();
+
+      // Transform the data
+      return results.map((show: any) => ({
+        adult: show.adult,
+        backdropPath: show.backdrop_path,
+        genreIds: show.genre_ids,
+        id: show.id,
+        originalLanguage: show.original_language,
+        originalName: show.original_name,
+        overview: show.overview,
+        popularity: show.popularity,
+        posterPath: show.poster_path,
+        firstAirDate: show.first_air_date,
+        name: show.name,
+        voteAverage: show.vote_average,
+        voteCount: show.vote_count,
+        mediaType: show.media_type,
+      }));
     },
   },
 

@@ -1,4 +1,4 @@
-export interface Movie {
+export interface TVShow {
   adult: boolean;
   backdropPath: string | null;
   genreIds: number[];
@@ -13,4 +13,6 @@ export interface Movie {
   video: boolean;
   voteAverage: number;
   voteCount: number;
+  name: string;
+  firstAirDate: string;
 }
