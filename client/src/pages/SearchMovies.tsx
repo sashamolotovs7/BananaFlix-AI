@@ -1,21 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
-import { Container, Col, Form, Button, Card, Row } from 'react-bootstrap';
 import Auth from '../utils/auth';
-import { saveMovieIds, getSavedMovieIds } from '../utils/localStorage';
+import { saveNextUpMovieIds, getNextUpMovieIds, getSeenItMovieIds } from '../utils/localStorage';
 import type { Movie } from '../models/Movie';
 import { searchMovies } from '../utils/API';
+import { useMutation } from '@apollo/client';
+import { SAVE_NEXT_UP_MOVIE, SAVE_SEEN_IT_MOVIE } from '../utils/mutations';
 
 const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 
 const SearchMovies = () => {
   const [searchedMovies, setSearchedMovies] = useState<Movie[]>([]);
   const [searchInput, setSearchInput] = useState('');
-  const [savedMovieIds, setSavedMovieIds] = useState(getSavedMovieIds());
+  const [savedSeenItMovieIds, setSeenItMovieIds] = useState(getSeenItMovieIds());
+  const [savedNextUpMovieIds, setNextUpMovieIds] = useState(getNextUpMovieIds());
+
+  const [savedSeenItMovie] = useMutation(SAVE_SEEN_IT_MOVIE);
+  const [savedNextUpMovie] = useMutation(SAVE_NEXT_UP_MOVIE);
 
   useEffect(() => {
-    return () => saveMovieIds(savedMovieIds);
-  }, [savedMovieIds]);
+    const fetchData = () => {
+      savedSeenItMovieIds(savedSeenItMovieIds);
+      savedNextUpMovieIds(savedNextUpMovieIds);
+    };
+    fetchData(); 
+  }, []);
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
