@@ -1,152 +1,137 @@
-import { User} from '../models/index.js';
-import { signToken, AuthenticationError } from '../services/auth.js';
+import User from '../models/User.js';
+import { AuthenticationError } from 'apollo-server';
+import { signToken } from '../services/auth.js';
 
-// Define types for the arguments
-interface AddUserArgs {
-  input: {
-    username: string;
-    email: string;
-    password: string;
-  }
-}
-
-interface LoginUserArgs {
+interface User {
+  _id: string;
+  username: string;
   email: string;
   password: string;
+  movieCount: number;
 }
 
-// interface UserArgs {
-//   username: string;
-// }
 
-// interface BookArgs {
-//   bookId: string;
-// }
-
-// interface AddBookArgs {
-//   input: {
-//     bookId: string;
-//     authors: string[];
-//     description: string;
-//     title: string;
-//     image: string;
-//     link: string;
-//   }
-// }
+interface Context {
+  user?: User;
+}
 
 const resolvers = {
   Query: {
-    // Future development
-    // ----------------------------------------------------------
-    // users: async () => {
-    //   return User.find().populate('books');
-    // },
-    // user: async (_parent: any, { username }: UserArgs) => {
-    //   return User.findOne({ username }).populate('books');
-    // },
-    // books: async () => {
-    //   return await Book.find().sort({ createdAt: -1 });
-    // },
-    // book: async (_parent: any, { bookId }: BookArgs) => {
-    //   return await Book.findOne({ _id: bookId });
-    // },
-    // ----------------------------------------------------------
-    me: async (_parent: any, _args: any, context: any) => {
-      // console.log('Context:', context);
-      console.log('User:', context.user);
-
-      if (context.user) {
-        return User.findOne({ _id: context.user._id }).populate('savedBooks');
-      }
-      throw new AuthenticationError('Could not authenticate user.');
+    me: async (_: unknown, __: unknown, context: Context) => {
+      if (!context.user) throw new AuthenticationError('Could not find user');
+      return await User.findOne({ _id: context.user._id });
     },
   },
+
   Mutation: {
-    addUser: async (_parent: any, { input }: AddUserArgs) => {
-      const user = await User.create({ ...input });
+    addUser: async (
+      _: unknown,
+      { input }: { input: { username: string; email: string; password: string } }
+    ) => {
+      const user = await User.create(input);
       const token = signToken(user.username, user.email, user._id);
       return { token, user };
     },
 
-    login: async (_parent: any, { email, password }: LoginUserArgs) => {
-      const user = await User.findOne({ email });
+    login: async (_: any, { email, password }: any) => {
+      const user = await User.findOne({ $or: [{ username: email }, { email }] });
+
       if (!user) {
-        throw new AuthenticationError('Could not authenticate user.');
+        throw new AuthenticationError("Can't find this user");
       }
 
       const correctPw = await user.isCorrectPassword(password);
       if (!correctPw) {
-        throw new AuthenticationError('Could not authenticate user.');
+        throw new AuthenticationError('Incorrect password!');
       }
 
-      const token = signToken(user.username, user.email, user._id);
+      const token = signToken(user.username, email, user._id);
       return { token, user };
     },
 
-    // saveBook: async (_parent: any, { input }: AddBookArgs, context: any) => {
-    //   if (context.user) {
-    //     console.log('Received book data:', input); // log
+    saveMovie: async (_: any, { input }: any, context: any) => {
+      if (context.user) {
+        try {
+          const updatedUser = await User.findOneAndUpdate(
+            { _id: context.user._id },
+            { $addToSet: { savedMovies: input } },
+            { new: true, runValidators: true }
+          );
+          return updatedUser;
+        } catch (err) {
+          throw new AuthenticationError('Failed to save the book');
+        }
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
 
-    //     try {
-    //       // Create the book
-    //       const book = await Book.create(input);
-    //       console.log('Created book:', book); // log
+    removeMovie: async (_: any, { movieId }: { movieId: string }, context: Context) => {
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $pull: { savedMovies: { movieId } } },
+          { new: true }
+        );
 
-    //       // Update the user and add the book to their savedBooks
-    //       const updatedUser = await User.findByIdAndUpdate(
-    //         context.user._id,
-    //         { $addToSet: { savedBooks: book._id } },
-    //         { new: true, runValidators: true }
-    //       ).populate('savedBooks');
+        if (!updatedUser) {
+          throw new AuthenticationError("Couldn't find user with this id!");
+        }
 
-    //       console.log('Updated user:', updatedUser); // log
+        return updatedUser;
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
 
-    //       if (!updatedUser) {
-    //         throw new Error('User not found');
-    //       }
+    markAsNextUp: async (_: any, { movieId }: { movieId: string }, context: Context) => {
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { nextUpMovies: movieId } },
+          { new: true, runValidators: true }
+        );
 
-    //       // Return the newly created book, not the user
-    //       return book;
-    //     } catch (error) {
-    //       console.error('Error in saveBook mutation:', error);
-    //       throw new Error('Failed to save the book');
-    //     }
-    //   }
-    //   throw new AuthenticationError('You need to be logged in!');
-    // },
+        return updatedUser;
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
 
-    // removeBook: async (_parent: any, { bookId }: BookArgs, context: any) => {
-    //   if (context.user) {
-    //     try {
-    //       // Find the book by bookId, not _id
-    //       const book = await Book.findOneAndDelete({ bookId: bookId });
+    markAsSeen: async (_: any, { movieId }: { movieId: string }, context: Context) => {
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { seenMovies: movieId } },
+          { new: true, runValidators: true }
+        );
 
-    //       if (!book) {
-    //         throw new Error('No book found with this ID.');
-    //       }
+        return updatedUser;
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
 
-    //       // Remove the book from the user's savedBooks
-    //       const updatedUser = await User.findByIdAndUpdate(
-    //         context.user._id,
-    //         { $pull: { savedBooks: book._id } },
-    //         { new: true }
-    //       ).populate('savedBooks');
+    rateMovie: async (_: any, { movieId, rating }: { movieId: string; rating: number }, context: Context) => {
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          {
+            $set: {
+              'movieRatings.$[elem].rating': rating,
+            },
+          },
+          {
+            arrayFilters: [{ 'elem.movieId': movieId }],
+            new: true,
+          }
+        );
 
-    //       if (!updatedUser) {
-    //         throw new Error('User not found');
-    //       }
+        // If rating does not exist, add a new rating entry
+        if (!updatedUser) {
+          throw new Error("Couldn't update the rating");
+        }
 
-    //       console.log('Book removed:', book);
-    //       console.log('Updated user:', updatedUser);
-
-    //       return book; // Return the book that was removed
-    //     } catch (error) {
-    //       console.error('Error in removeBook mutation:', error);
-    //       throw new Error('Failed to remove the book');
-    //     }
-    //   }
-    //   throw new AuthenticationError('You need to be logged in!');
-    // },
+        return updatedUser;
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
   },
 };
 

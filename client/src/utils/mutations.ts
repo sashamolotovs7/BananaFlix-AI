@@ -26,16 +26,37 @@ export const ADD_USER = gql`
   }
 `;
 
-// Mutation for saving a book to a user's collection
-export const SAVE_BOOK = gql`
-  mutation saveBook($input: BookInput!) {
-    saveBook(input: $input) {
-      bookId
-      title
-      authors
-      description
-      image
-      link
+export const SAVE_SEEN_IT_MOVIE = gql`
+  mutation SaveSeenItMovie($movieId: ID!, $details: MovieInput!) {
+    saveSeenItMovie(movieId: $movieId, details: $details) {
+      _id
+      username
+      seenIt {
+        movieId
+        title
+        overview
+        posterPath
+        releaseDate
+        voteAverage
+      }
+    }
+  }
+`;
+
+
+export const SAVE_NEXT_UP_MOVIE = gql`
+  mutation SaveNextUpMovie($movieId: ID!, $details: MovieInput!) {
+    saveNextUpMovie(movieId: $movieId, details: $details) {
+      _id
+      username
+      savedNextUpMovies {
+        movieId
+        title
+        overview
+        posterPath
+        releaseDate
+        voteAverage
+      }
     }
   }
 `;
