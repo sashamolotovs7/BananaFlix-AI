@@ -6,6 +6,9 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './services/auth.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // render fix ?
 import { fileURLToPath } from 'url';
