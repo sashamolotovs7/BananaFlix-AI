@@ -10,6 +10,42 @@ const typeDefs = gql`
     voteAverage: Float
   }
 
+    type APIMovie {
+    adult: Boolean!
+    backdropPath: String
+    genreIds: [Int!]!
+    id: ID!
+    originalLanguage: String!
+    originalTitle: String!
+    overview: String
+    popularity: Float
+    posterPath: String
+    releaseDate: String
+    title: String!
+    video: Boolean!
+    voteAverage: Float
+    voteCount: Int
+    mediaType: String! # Added mediaType
+  }
+
+  type APITVShow {
+    adult: Boolean!
+    backdropPath: String
+    genreIds: [Int!]!
+    id: ID!
+    originalLanguage: String!
+    originalName: String!
+    overview: String
+    popularity: Float
+    posterPath: String
+    firstAirDate: String
+    name: String!
+    voteAverage: Float
+    voteCount: Int
+    mediaType: String! # Added mediaType
+    first_air_date: String
+  }
+
   type User {
     _id: ID!
     username: String!
@@ -30,8 +66,19 @@ const typeDefs = gql`
     rating: Float
   }
 
+  type TVShow {
+    id: ID!
+    name: String!
+    overview: String
+    poster_path: String
+    first_air_date: String
+    popularity: Float
+  }
+
   type Query {
     me: User
+    trendingMovies: [APIMovie!]!
+    trendingTVShows: [APITVShow!]!
   }
 
   input MovieInput {
@@ -55,6 +102,7 @@ const typeDefs = gql`
     saveSeenItMovie(movieId: ID!, details: MovieInput!): User
     saveNextUpMovie(movieId: ID!, details: MovieInput!): User
     removeMovie(movieId: String!): User
+    saveMovie(movieId: String!): User
     markAsNextUp(movieId: String!): User
     markAsSeen(movieId: String!): User
     rateMovie(movieId: String!, rating: Float!): User
