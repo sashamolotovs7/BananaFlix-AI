@@ -1,10 +1,10 @@
-import ReactDOM from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import ReactDOM from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-import App from './App.jsx'
-import Landing from './pages/Landing'
-import Trending from './pages/Trending.js'
+import App from './App.jsx';
+import Landing from './pages/Landing';
+import Trending from './pages/Trending';
 // import SignupForm from './components/SignupForm'
 // import LoginForm from './components/LoginForm'
 
