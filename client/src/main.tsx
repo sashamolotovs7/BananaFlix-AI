@@ -1,14 +1,12 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 import App from './App.jsx'
-// import SearchBooks from './pages/SearchBooks'
-// import SavedBooks from './pages/SavedBooks'
 import Landing from './pages/Landing'
 import Trending from './pages/Trending.js'
-// import SignupForm from './pages/Signup'
+// import SignupForm from './components/SignupForm'
+// import LoginForm from './components/LoginForm'
 
 const router = createBrowserRouter([
   {
@@ -23,10 +21,14 @@ const router = createBrowserRouter([
       {
         path: '/trending',
         element: <Trending />
-      }
+      },
       // {
       //   path: '/signup',
-      //   element: <SignupForm />
+      //   element: <SignupForm handleModalClose={() =>  setShowModal(false) } />
+      // },
+      // {
+      //   path: '/login',
+      //   element: <LoginForm handleModalClose={() => { /* handle modal close logic */ }} />
       // }
     ]
   }
