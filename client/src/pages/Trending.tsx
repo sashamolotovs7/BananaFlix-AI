@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Movie } from '../models/Movie';
 import { TVShow } from '../models/TvShow';
 
+
 const TRENDING_MOVIES = gql`
   query GetTrendingMovies {
     trendingMovies {

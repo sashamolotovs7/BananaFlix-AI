@@ -13,9 +13,9 @@ import { searchMovies } from '../utils/API';
 import { SAVE_NEXT_UP_MOVIE} from '../utils/mutations';
 
 
-// const API_KEY = import.meta.env.REACT_APP_SEARCH_API_KEY;
+const API_KEY = import.meta.env.VITE_REACT_APP_TMDB_API_KEY;
 // console.log(API_KEY);
-const API_KEY = '3cf3a21f6ab6a535c48817d1aa4df009'
+//const API_KEY = '3cf3a21f6ab6a535c48817d1aa4df009'
 // const API_KEY = process.env.SEARCH_TMDB_API_KEY;
 
 const SearchMovies = () => {
