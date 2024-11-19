@@ -2,10 +2,13 @@ import express from 'express';
 import path from 'node:path';
 import type { Request, Response } from 'express';
 import db from './config/connection.js'
-import { ApolloServer } from '@apollo/server';// Note: Import from @apollo/server-express
+import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './services/auth.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // render fix ?
 import { fileURLToPath } from 'url';
@@ -57,8 +60,8 @@ const startApolloServer = async () => {
 
   // Start the server
   app.listen(PORT, () => {
-    console.log(`API server running on port ${PORT}!`);
-    console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
+    console.log(`🌍 Movie app is running on port ${PORT}!`);
+    console.log(`🚀 GraphQL endpoint available at http://localhost:${PORT}/graphql`);
   });
 };
 

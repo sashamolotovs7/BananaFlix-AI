@@ -61,7 +61,7 @@ export const SAVE_NEXT_UP_MOVIE = gql`
   }
 `;
 
-// Mutation for removing a book from a user's collection
+
 export const REMOVE_BOOK = gql`
   mutation removeBook($bookId: ID!) {
     removeBook(bookId: $bookId) {
