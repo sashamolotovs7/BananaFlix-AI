@@ -109,18 +109,15 @@ const resolvers = {
       return { token, user };
     },
 
-    saveMovie: async (_: any, { input }: any, context: any) => {
+    saveNextUpMovie: async (_: any, { movieId, details }: { movieId: string; details: any }, context: Context) => {
       if (context.user) {
-        try {
-          const updatedUser = await User.findOneAndUpdate(
-            { _id: context.user._id },
-            { $addToSet: { savedMovies: input } },
-            { new: true, runValidators: true }
-          );
-          return updatedUser;
-        } catch (err) {
-          throw new AuthenticationError('Failed to save the book');
-        }
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { nextUpMovies: { movieId, details } } },
+          { new: true, runValidators: true }
+        );
+
+        return updatedUser;
       }
       throw new AuthenticationError('You need to be logged in!');
     },
@@ -136,19 +133,6 @@ const resolvers = {
         if (!updatedUser) {
           throw new AuthenticationError("Couldn't find user with this id!");
         }
-
-        return updatedUser;
-      }
-      throw new AuthenticationError('You need to be logged in!');
-    },
-
-    markAsNextUp: async (_: any, { movieId }: { movieId: string }, context: Context) => {
-      if (context.user) {
-        const updatedUser = await User.findOneAndUpdate(
-          { _id: context.user._id },
-          { $addToSet: { nextUpMovies: movieId } },
-          { new: true, runValidators: true }
-        );
 
         return updatedUser;
       }

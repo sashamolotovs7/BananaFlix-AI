@@ -43,13 +43,12 @@ export const SAVE_SEEN_IT_MOVIE = gql`
   }
 `;
 
-
 export const SAVE_NEXT_UP_MOVIE = gql`
-  mutation SaveNextUpMovie($movieId: ID!, $details: MovieInput!) {
+  mutation saveNextUpMovie($movieId: ID!, $details: MovieInput!) {
     saveNextUpMovie(movieId: $movieId, details: $details) {
       _id
       username
-      savedNextUpMovies {
+      nextUpMovies {
         movieId
         title
         overview
@@ -60,7 +59,6 @@ export const SAVE_NEXT_UP_MOVIE = gql`
     }
   }
 `;
-
 
 export const REMOVE_BOOK = gql`
   mutation removeBook($bookId: ID!) {

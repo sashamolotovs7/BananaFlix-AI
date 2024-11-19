@@ -103,7 +103,6 @@ const typeDefs = gql`
     saveNextUpMovie(movieId: ID!, details: MovieInput!): User
     removeMovie(movieId: String!): User
     saveMovie(movieId: String!): User
-    markAsNextUp(movieId: String!): User
     markAsSeen(movieId: String!): User
     rateMovie(movieId: String!, rating: Float!): User
   }

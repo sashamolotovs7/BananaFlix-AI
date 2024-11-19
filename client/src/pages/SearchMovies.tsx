@@ -15,7 +15,7 @@ import { SAVE_NEXT_UP_MOVIE, SAVE_SEEN_IT_MOVIE } from '../utils/mutations';
 
 // const API_KEY = import.meta.env.REACT_APP_SEARCH_API_KEY;
 // console.log(API_KEY);
-const API_KEY = 'YOUR SHORT API KEY HERE'
+const API_KEY = '3cf3a21f6ab6a535c48817d1aa4df009'
 // const API_KEY = process.env.SEARCH_TMDB_API_KEY;
 
 const SearchMovies = () => {
@@ -63,15 +63,26 @@ const SearchMovies = () => {
   const handleAddToNextUp = async (movie: Movie) => {
     if (savedNextUpMovieIds.includes(movie.id.toString())) return; // Corrected to `movie.id`
     
+    // Create the details object to match MovieInput
+    const details = {
+        movieId: movie.id,
+        title: movie.title,
+        overview: movie.overview,
+        posterPath: movie.posterPath,
+        releaseDate: movie.releaseDate,
+        voteAverage: movie.voteAverage,
+    };
+    console.log('details:', details);
+
     try {
-      console.log('saveNextUp called:', movie.id, movie);
-      await saveNextUpMovie({
-        variables: { movieId: movie.id, details: movie }, // Use `movie.id`
-      });
-      
-      setSavedNextUpMovieIds([...savedNextUpMovieIds, movie.id.toString()]); // Use `movie.id`
+        console.log('saveNextUp called:', movie.id, movie);
+        await saveNextUpMovie({
+            variables: { movieId: movie.id, details }, // Use the structured `details` object
+        });
+        
+        setSavedNextUpMovieIds([...savedNextUpMovieIds, movie.id.toString()]); // Use `movie.id`
     } catch (error) {
-      console.error('Error saving movie to Next Up:', error);
+        console.error('Error saving movie to Next Up:', error);
     }
   };
 
