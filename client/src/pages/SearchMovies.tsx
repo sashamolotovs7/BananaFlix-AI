@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { useMutation } from '@apollo/client';
-import Auth from '../utils/auth';
+// import Auth from '../utils/auth';
 import {
   saveNextUpMovieIds,
   getNextUpMovieIds,
@@ -12,7 +12,11 @@ import type { Movie } from '../models/Movie';
 import { searchMovies } from '../utils/API';
 import { SAVE_NEXT_UP_MOVIE, SAVE_SEEN_IT_MOVIE } from '../utils/mutations';
 
-const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+
+// const API_KEY = import.meta.env.REACT_APP_SEARCH_API_KEY;
+// console.log(API_KEY);
+const API_KEY = 'YOUR SHORT API KEY HERE'
+// const API_KEY = process.env.SEARCH_TMDB_API_KEY;
 
 const SearchMovies = () => {
   const [searchedMovies, setSearchedMovies] = useState<Movie[]>([]);
@@ -34,6 +38,7 @@ const SearchMovies = () => {
 
     try {
       const response = await searchMovies(API_KEY, searchInput);
+      console.log(response);
       if (!response.ok) throw new Error('Failed to fetch movies.');
 
       const data = await response.json();
@@ -57,11 +62,13 @@ const SearchMovies = () => {
 
   const handleAddToNextUp = async (movie: Movie) => {
     if (savedNextUpMovieIds.includes(movie.id.toString())) return; // Corrected to `movie.id`
-
+    
     try {
+      console.log('saveNextUp called:', movie.id, movie);
       await saveNextUpMovie({
         variables: { movieId: movie.id, details: movie }, // Use `movie.id`
       });
+      
       setSavedNextUpMovieIds([...savedNextUpMovieIds, movie.id.toString()]); // Use `movie.id`
     } catch (error) {
       console.error('Error saving movie to Next Up:', error);
@@ -91,6 +98,7 @@ const SearchMovies = () => {
           onChange={(e) => setSearchInput(e.target.value)}
         />
         <button type="submit">Search</button>
+        <p>API KEY = {API_KEY}</p>
       </form>
 
       <div className="movie-results">

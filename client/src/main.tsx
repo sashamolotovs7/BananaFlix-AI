@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App.jsx';
 import Landing from './pages/Landing';
 import Trending from './pages/Trending';
+import SearchMovies from './pages/SearchMovies';
 // import SignupForm from './components/SignupForm'
 // import LoginForm from './components/LoginForm'
 
@@ -19,8 +20,12 @@ const router = createBrowserRouter([
         element: <Landing />
       }, 
       {
-        path: '/trending',
+        path:'/trending',
         element: <Trending />
+      },
+      {
+        path:'/search',
+        element: <SearchMovies />
       },
       // {
       //   path: '/signup',
