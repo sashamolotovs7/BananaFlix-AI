@@ -5,12 +5,12 @@ import { useMutation } from '@apollo/client';
 import {
   saveNextUpMovieIds,
   getNextUpMovieIds,
-  saveSeenItMovieIds,
-  getSeenItMovieIds,
+  // saveSeenItMovieIds,
+  // getSeenItMovieIds,
 } from '../utils/localStorage';
 import type { Movie } from '../models/Movie';
 import { searchMovies } from '../utils/API';
-import { SAVE_NEXT_UP_MOVIE, SAVE_SEEN_IT_MOVIE } from '../utils/mutations';
+import { SAVE_NEXT_UP_MOVIE} from '../utils/mutations';
 
 
 // const API_KEY = import.meta.env.REACT_APP_SEARCH_API_KEY;
@@ -22,15 +22,15 @@ const SearchMovies = () => {
   const [searchedMovies, setSearchedMovies] = useState<Movie[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const [savedNextUpMovieIds, setSavedNextUpMovieIds] = useState<string[]>(getNextUpMovieIds());
-  const [savedSeenItMovieIds, setSavedSeenItMovieIds] = useState<string[]>(getSeenItMovieIds());
+  // const [savedSeenItMovieIds, setSavedSeenItMovieIds] = useState<string[]>(getSeenItMovieIds());
 
   const [saveNextUpMovie] = useMutation(SAVE_NEXT_UP_MOVIE);
-  const [saveSeenItMovie] = useMutation(SAVE_SEEN_IT_MOVIE);
+  // const [saveSeenItMovie] = useMutation(SAVE_SEEN_IT_MOVIE);
 
   useEffect(() => {
     saveNextUpMovieIds(savedNextUpMovieIds);
-    saveSeenItMovieIds(savedSeenItMovieIds);
-  }, [savedNextUpMovieIds, savedSeenItMovieIds]);
+    // saveSeenItMovieIds(savedSeenItMovieIds);
+  }, [savedNextUpMovieIds]);
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -75,9 +75,9 @@ const SearchMovies = () => {
     console.log('details:', details);
 
     try {
-        console.log('saveNextUp called:', movie.id, movie);
+        console.log('saveNextUp called:', movie.id);
         await saveNextUpMovie({
-            variables: { movieId: movie.id, details }, // Use the structured `details` object
+            variables: { input: details }, // Use the structured `details` object
         });
         
         setSavedNextUpMovieIds([...savedNextUpMovieIds, movie.id.toString()]); // Use `movie.id`
@@ -86,18 +86,7 @@ const SearchMovies = () => {
     }
   };
 
-  const handleSeenIt = async (movie: Movie) => {
-    if (savedSeenItMovieIds.includes(movie.id.toString())) return; // Corrected to `movie.id`
-
-    try {
-      await saveSeenItMovie({
-        variables: { movieId: movie.id, details: movie }, // Use `movie.id`
-      });
-      setSavedSeenItMovieIds([...savedSeenItMovieIds, movie.id.toString()]); // Use `movie.id`
-    } catch (error) {
-      console.error('Error saving movie to Seen It:', error);
-    }
-  };
+  
 
   return (
     <div className="search-movies">
@@ -121,7 +110,7 @@ const SearchMovies = () => {
             <p>Release Date: {movie.releaseDate}</p>
             <p>Rating: {movie.voteAverage}</p>
             <button onClick={() => handleAddToNextUp(movie)}>Add to Next Up</button>
-            <button onClick={() => handleSeenIt(movie)}>Seen It</button>
+            <button >Seen It</button>
           </div>
         ))}
       </div>

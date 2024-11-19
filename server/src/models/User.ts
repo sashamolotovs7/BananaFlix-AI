@@ -1,9 +1,7 @@
 import { Schema, model, type Document } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { MovieDocument } from './Movie';
 
-// import schema from Book.js
-// import bookSchema from './Book.js';
-// import type { BookDocument } from './Book.js';
 
 export interface UserDocument extends Document {
   id: string;
@@ -11,7 +9,7 @@ export interface UserDocument extends Document {
   email: string;
   password: string;
   isCorrectPassword(password: string): Promise<boolean>;
-  bookCount: number;
+  nextUp: [MovieDocument];
 }
 
 const userSchema = new Schema<UserDocument>(
@@ -31,6 +29,9 @@ const userSchema = new Schema<UserDocument>(
       type: String,
       required: true,
     },
+    nextUp: {
+      type: [{ type: Schema.Types.ObjectId, ref: 'Movie' }],
+    }
   },
   // set this to use virtual below
   {
