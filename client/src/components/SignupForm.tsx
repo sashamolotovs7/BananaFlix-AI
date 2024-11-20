@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
+import { useMutation } from '@apollo/client';
 import Auth from '../utils/auth';
 // import  User from '../../../server/src/models/User.js'; // change to import the apollo model? - not needed
 
 // imported useMutation hook
-import { useMutation } from '@apollo/client';
 // imported mutation
 import { ADD_USER } from '../utils/mutations';
+import type { ChangeEvent, FormEvent } from 'react';
 
 // biome-ignore lint/correctness/noEmptyPattern: <explanation>
 const SignupForm = ({}: { handleModalClose: () => void }) => {
