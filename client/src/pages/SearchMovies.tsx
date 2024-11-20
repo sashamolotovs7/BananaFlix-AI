@@ -43,7 +43,7 @@ const SearchMovies = () => {
 
       const data = await response.json();
       const movieData = data.results.map((movie: any) => ({
-        id: movie.id, // Use `id` here
+        id: movie.id,
         title: movie.title,
         overview: movie.overview,
         posterPath: movie.poster_path

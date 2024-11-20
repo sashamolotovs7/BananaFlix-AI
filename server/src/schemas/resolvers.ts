@@ -168,25 +168,22 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    saveNextUp: async (_: any, { input }: AddMovieArgs, context: Context) => {
+    saveNextUpMovie: async (_: any, { input }: AddMovieArgs, context: Context) => {
       if (context.user) {
         // Create a new movie document using the Movie model
         const newMovie = await Movie.create(input);
-
-        console.log('New movie:', newMovie);
-
+    
         // Update the user's nextUpMovies array with the new movie's ID
-        const updatedUser = await User.findOneAndUpdate(
+        await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { nextUpMovies: newMovie._id } }, // Add the new movie's ID to nextUpMovies
+          { $addToSet: { nextUpMovies: newMovie.movieId } }, // Add the movie's ID to nextUpMovies
           { new: true }
         );
-
-        if (!updatedUser) {
-          throw new AuthenticationError("Couldn't find user with this id!");
-        }
-
-        return updatedUser;
+    
+        console.log('New movie:', newMovie);
+    
+        // Return the new movie object
+        return newMovie;
       }
       throw new AuthenticationError('You need to be logged in!');
     },
