@@ -25,7 +25,7 @@ export default [
     rules: {
       // TypeScript rules
       "@typescript-eslint/no-unused-vars": "warn",
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-explicit-any": "off", // turn on if you want ot fix typeannotate
       "@typescript-eslint/explicit-function-return-type": "off",
 
       // React rules
@@ -33,7 +33,29 @@ export default [
       "react/prop-types": "off", // Disable prop-types for TypeScript
 
       // General rules
-      "import/order": ["warn", { groups: [["builtin", "external", "internal"]] }],
+      "import/order": [
+        "error",
+        {
+          "pathGroups": [
+            {
+              "pattern": "path",
+              "group": "builtin",
+              "position": "before"
+            }
+          ],
+          "groups": [
+            "builtin",
+            "external",
+            "internal",
+            "unknown",
+            "parent",
+            "sibling",
+            "index",
+            "object",
+            "type"
+          ]
+        }
+      ],
     },
   },
 ];

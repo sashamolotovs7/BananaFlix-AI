@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import type { FormEvent } from 'react';
 import { useMutation } from '@apollo/client';
 // import Auth from '../utils/auth';
 import {
@@ -8,9 +7,10 @@ import {
   // saveSeenItMovieIds,
   // getSeenItMovieIds,
 } from '../utils/localStorage';
-import type { Movie } from '../models/Movie';
 import { searchMovies } from '../utils/API';
 import { SAVE_NEXT_UP_MOVIE} from '../utils/mutations';
+import type { Movie } from '../models/Movie';
+import type { FormEvent } from 'react';
 
 
 const API_KEY = import.meta.env.VITE_REACT_APP_TMDB_API_KEY;
