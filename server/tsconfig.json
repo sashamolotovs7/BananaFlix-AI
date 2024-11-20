@@ -8,7 +8,13 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+
+    /* Linting and Paths */
+    "baseUrl": "./",
+    "paths": {
+      "*": ["node_modules/*"]
+    }
   },
   "include": ["src"],
   "typeRoots": ["./node_modules/@types", "./src/types"]

@@ -1,12 +1,10 @@
-import { useState, useEffect } from 'react';
-import type { FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useMutation } from '@apollo/client';
 import { saveNextUpMovieIds, getNextUpMovieIds } from '../utils/localStorage';
 import type { Movie } from '../models/Movie';
 import { searchMovies } from '../utils/API';
 import { SAVE_NEXT_UP_MOVIE } from '../utils/mutations';
 import './SearchMovies.css';
-import BananaRating from '../components/BananaRating';
 
 
 const API_KEY = import.meta.env.VITE_REACT_APP_TMDB_API_KEY;
