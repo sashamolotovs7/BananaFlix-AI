@@ -4,10 +4,10 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
 // import { loginUser } from '../utils/API'; // no longer needed
+import { useMutation } from '@apollo/client';
 import Auth from '../utils/auth';
 import type { User } from '../models/User';
 // import useMutation hook
-import { useMutation } from '@apollo/client';
 // import mutation
 import { LOGIN_USER } from '../utils/mutations';
 

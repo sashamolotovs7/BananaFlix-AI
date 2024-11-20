@@ -1,10 +1,8 @@
 import express from 'express';
 import path from 'node:path';
 import type { Request, Response } from 'express';
-import db from './config/connection.js'
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
-import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './services/auth.js';
 import dotenv from 'dotenv';
 
@@ -13,6 +11,8 @@ dotenv.config();
 // render fix ?
 import { fileURLToPath } from 'url';
 import { dirname } from 'path'
+import { typeDefs, resolvers } from './schemas/index.js';
+import db from './config/connection.js'
 // Get the directory name of the current module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
