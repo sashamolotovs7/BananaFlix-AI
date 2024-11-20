@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import { AuthenticationError, signToken } from '../services/auth.js';
+import Movie from '../models/Movie.js';
 
 interface User {
   _id: string;
@@ -15,6 +16,19 @@ interface Context {
 
 const TMDB_API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
+
+// Define the AddMovieArgs interface
+interface AddMovieArgs {
+  input: {
+    movieId: string;
+    title: string;
+    overview: string;
+    posterPath: string;
+    releaseDate: string;
+    voteAverage: number;
+  };
+}
+
 const resolvers = {
   Query: {
     me: async (_: unknown, __: unknown, context: Context) => {
@@ -109,21 +123,7 @@ const resolvers = {
       return { token, user };
     },
 
-    saveMovie: async (_: any, { input }: any, context: any) => {
-      if (context.user) {
-        try {
-          const updatedUser = await User.findOneAndUpdate(
-            { _id: context.user._id },
-            { $addToSet: { savedMovies: input } },
-            { new: true, runValidators: true }
-          );
-          return updatedUser;
-        } catch (err) {
-          throw new AuthenticationError('Failed to save the book');
-        }
-      }
-      throw new AuthenticationError('You need to be logged in!');
-    },
+    
 
     removeMovie: async (_: any, { movieId }: { movieId: string }, context: Context) => {
       if (context.user) {
@@ -142,31 +142,6 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    markAsNextUp: async (_: any, { movieId }: { movieId: string }, context: Context) => {
-      if (context.user) {
-        const updatedUser = await User.findOneAndUpdate(
-          { _id: context.user._id },
-          { $addToSet: { nextUpMovies: movieId } },
-          { new: true, runValidators: true }
-        );
-
-        return updatedUser;
-      }
-      throw new AuthenticationError('You need to be logged in!');
-    },
-
-    markAsSeen: async (_: any, { movieId }: { movieId: string }, context: Context) => {
-      if (context.user) {
-        const updatedUser = await User.findOneAndUpdate(
-          { _id: context.user._id },
-          { $addToSet: { seenMovies: movieId } },
-          { new: true, runValidators: true }
-        );
-
-        return updatedUser;
-      }
-      throw new AuthenticationError('You need to be logged in!');
-    },
 
     rateMovie: async (_: any, { movieId, rating }: { movieId: string; rating: number }, context: Context) => {
       if (context.user) {
@@ -189,6 +164,26 @@ const resolvers = {
         }
 
         return updatedUser;
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    },
+
+    saveNextUpMovie: async (_: any, { input }: AddMovieArgs, context: Context) => {
+      if (context.user) {
+        // Create a new movie document using the Movie model
+        const newMovie = await Movie.create(input);
+    
+        // Update the user's nextUpMovies array with the new movie's ID
+        await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { nextUpMovies: newMovie.movieId } }, // Add the movie's ID to nextUpMovies
+          { new: true }
+        );
+    
+        console.log('New movie:', newMovie);
+    
+        // Return the new movie object
+        return newMovie;
       }
       throw new AuthenticationError('You need to be logged in!');
     },

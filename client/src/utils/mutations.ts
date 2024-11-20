@@ -26,42 +26,9 @@ export const ADD_USER = gql`
   }
 `;
 
-export const SAVE_SEEN_IT_MOVIE = gql`
-  mutation SaveSeenItMovie($movieId: ID!, $details: MovieInput!) {
-    saveSeenItMovie(movieId: $movieId, details: $details) {
-      _id
-      username
-      seenIt {
-        movieId
-        title
-        overview
-        posterPath
-        releaseDate
-        voteAverage
-      }
-    }
-  }
-`;
 
 
-export const SAVE_NEXT_UP_MOVIE = gql`
-  mutation SaveNextUpMovie($movieId: ID!, $details: MovieInput!) {
-    saveNextUpMovie(movieId: $movieId, details: $details) {
-      _id
-      username
-      savedNextUpMovies {
-        movieId
-        title
-        overview
-        posterPath
-        releaseDate
-        voteAverage
-      }
-    }
-  }
-`;
 
-// Mutation for removing a book from a user's collection
 export const REMOVE_BOOK = gql`
   mutation removeBook($bookId: ID!) {
     removeBook(bookId: $bookId) {
@@ -71,6 +38,20 @@ export const REMOVE_BOOK = gql`
       description
       image
       link
+    }
+  }
+`;
+
+// Mutation for saving a movie to the next up list
+export const SAVE_NEXT_UP_MOVIE = gql`
+  mutation saveNextUpMovie($input: MovieInput!) {
+    saveNextUpMovie(input: $input) {
+      movieId
+      title
+      overview
+      posterPath
+      releaseDate
+      voteAverage
     }
   }
 `;

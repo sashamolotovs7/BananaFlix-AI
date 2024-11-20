@@ -1,32 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import type { FormEvent } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
-import Auth from '../utils/auth';
+// import Auth from '../utils/auth';
 import {
   saveNextUpMovieIds,
   getNextUpMovieIds,
-  saveSeenItMovieIds,
-  getSeenItMovieIds,
+  // saveSeenItMovieIds,
+  // getSeenItMovieIds,
 } from '../utils/localStorage';
-import type { Movie } from '../models/Movie';
 import { searchMovies } from '../utils/API';
-import { SAVE_NEXT_UP_MOVIE, SAVE_SEEN_IT_MOVIE } from '../utils/mutations';
+import { SAVE_NEXT_UP_MOVIE} from '../utils/mutations';
+import type { Movie } from '../models/Movie';
+import type { FormEvent } from 'react';
 
-const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+
+const API_KEY = import.meta.env.VITE_REACT_APP_TMDB_API_KEY;
 
 const SearchMovies = () => {
   const [searchedMovies, setSearchedMovies] = useState<Movie[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const [savedNextUpMovieIds, setSavedNextUpMovieIds] = useState<string[]>(getNextUpMovieIds());
-  const [savedSeenItMovieIds, setSavedSeenItMovieIds] = useState<string[]>(getSeenItMovieIds());
+  // const [savedSeenItMovieIds, setSavedSeenItMovieIds] = useState<string[]>(getSeenItMovieIds());
 
   const [saveNextUpMovie] = useMutation(SAVE_NEXT_UP_MOVIE);
-  const [saveSeenItMovie] = useMutation(SAVE_SEEN_IT_MOVIE);
+  // const [saveSeenItMovie] = useMutation(SAVE_SEEN_IT_MOVIE);
 
   useEffect(() => {
     saveNextUpMovieIds(savedNextUpMovieIds);
-    saveSeenItMovieIds(savedSeenItMovieIds);
-  }, [savedNextUpMovieIds, savedSeenItMovieIds]);
+    // saveSeenItMovieIds(savedSeenItMovieIds);
+  }, [savedNextUpMovieIds]);
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,11 +35,12 @@ const SearchMovies = () => {
 
     try {
       const response = await searchMovies(API_KEY, searchInput);
+      console.log(response);
       if (!response.ok) throw new Error('Failed to fetch movies.');
 
       const data = await response.json();
       const movieData = data.results.map((movie: any) => ({
-        id: movie.id, // Use `id` here
+        id: movie.id,
         title: movie.title,
         overview: movie.overview,
         posterPath: movie.poster_path
@@ -57,29 +59,31 @@ const SearchMovies = () => {
 
   const handleAddToNextUp = async (movie: Movie) => {
     if (savedNextUpMovieIds.includes(movie.id.toString())) return; // Corrected to `movie.id`
+    
+    // Create the details object to match MovieInput
+    const details = {
+        movieId: movie.id,
+        title: movie.title,
+        overview: movie.overview,
+        posterPath: movie.posterPath,
+        releaseDate: movie.releaseDate,
+        voteAverage: movie.voteAverage,
+    };
+    console.log('details:', details);
 
     try {
-      await saveNextUpMovie({
-        variables: { movieId: movie.id, details: movie }, // Use `movie.id`
-      });
-      setSavedNextUpMovieIds([...savedNextUpMovieIds, movie.id.toString()]); // Use `movie.id`
+        console.log('saveNextUp called:', movie.id);
+        await saveNextUpMovie({
+            variables: { input: details }, // Use the structured `details` object
+        });
+        
+        setSavedNextUpMovieIds([...savedNextUpMovieIds, movie.id.toString()]); // Use `movie.id`
     } catch (error) {
-      console.error('Error saving movie to Next Up:', error);
+        console.error('Error saving movie to Next Up:', error);
     }
   };
 
-  const handleSeenIt = async (movie: Movie) => {
-    if (savedSeenItMovieIds.includes(movie.id.toString())) return; // Corrected to `movie.id`
-
-    try {
-      await saveSeenItMovie({
-        variables: { movieId: movie.id, details: movie }, // Use `movie.id`
-      });
-      setSavedSeenItMovieIds([...savedSeenItMovieIds, movie.id.toString()]); // Use `movie.id`
-    } catch (error) {
-      console.error('Error saving movie to Seen It:', error);
-    }
-  };
+  
 
   return (
     <div className="search-movies">
@@ -102,7 +106,7 @@ const SearchMovies = () => {
             <p>Release Date: {movie.releaseDate}</p>
             <p>Rating: {movie.voteAverage}</p>
             <button onClick={() => handleAddToNextUp(movie)}>Add to Next Up</button>
-            <button onClick={() => handleSeenIt(movie)}>Seen It</button>
+            <button >Seen It</button>
           </div>
         ))}
       </div>
