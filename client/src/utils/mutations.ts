@@ -44,8 +44,8 @@ export const REMOVE_BOOK = gql`
 
 // Mutation for saving a movie to the next up list
 export const SAVE_NEXT_UP_MOVIE = gql`
-  mutation saveNextUp($input: MovieInput!) {
-    saveNextUp(input: $input) {
+  mutation saveNextUpMovie($input: MovieInput!) {
+    saveNextUpMovie(input: $input) {
       movieId
       title
       overview
