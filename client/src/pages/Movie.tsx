@@ -15,4 +15,4 @@
       "title": "Florence Fight Club",
       "video": false,
       "vote_average": 7,
-      "vote_count": 1
+      "vote_count": 1;
