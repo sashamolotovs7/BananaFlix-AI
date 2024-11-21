@@ -62,16 +62,16 @@ const SearchMovies = () => {
 
   const handleAddToNextUp = async (movie: Movie) => {
     if (savedNextUpMovieIds.includes(movie.id.toString())) return;
-
+  
     const details = {
-      movieId: movie.id,
+      movieId: movie.id.toString(),
       title: movie.title,
       overview: movie.overview,
       posterPath: movie.posterPath,
       releaseDate: movie.releaseDate,
       voteAverage: movie.voteAverage,
     };
-
+  
     try {
       await saveNextUpMovie({ variables: { input: details } });
       setSavedNextUpMovieIds([...savedNextUpMovieIds, movie.id.toString()]);
@@ -79,19 +79,19 @@ const SearchMovies = () => {
       console.error('Error saving movie to Next Up:', error);
     }
   };
-
+  
   const handleSaveSeenIt = async (movie: Movie) => {
     if (savedSeenItMovieIds.includes(movie.id.toString())) return;
-
+  
     const details = {
-      movieId: movie.id,
+      movieId: movie.id.toString(),
       title: movie.title,
       overview: movie.overview,
       posterPath: movie.posterPath,
       releaseDate: movie.releaseDate,
       voteAverage: movie.voteAverage,
     };
-
+  
     try {
       await saveSeenItMovie({ variables: { input: details } });
       setSavedSeenItMovieIds([...savedSeenItMovieIds, movie.id.toString()]);
