@@ -2,7 +2,8 @@ import { gql } from 'graphql-tag';
 
 const typeDefs = gql`
   type Movie {
-    movieId: ID!
+    _id: ID!
+    movieId: String!
     title: String!
     overview: String!
     posterPath: String
@@ -51,8 +52,8 @@ const typeDefs = gql`
     username: String!
     email: String!
     savedMovies: [Movie]
-    nextUpMovies: [String]
-    seenItMovies: [String]
+    nextUpMovies: [Movie!]!
+    seenItMovies: [Movie!]!
     movieRatings: [MovieRating]
   }
 
@@ -82,9 +83,9 @@ const typeDefs = gql`
   }
 
   input MovieInput {
-    movieId: ID!
-    title: String!
-    overview: String!
+    movieId: String!
+    title: String
+    overview: String
     posterPath: String
     releaseDate: String
     voteAverage: Float
@@ -99,8 +100,8 @@ const typeDefs = gql`
   type Mutation {
     login(email: String!, password: String!): Auth
     addUser(input: UserInput!): Auth
-    saveNextUpMovie(input: MovieInput!): Movie
-    saveSeenItMovie(input: MovieInput!): Movie
+    saveNextUpMovie(input: MovieInput!): User
+    saveSeenItMovie(input: MovieInput!): User
     removeMovie(movieId: String!): User
     rateMovie(movieId: String!, rating: Float!): User
   }

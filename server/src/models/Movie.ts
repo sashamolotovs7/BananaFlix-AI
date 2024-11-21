@@ -11,10 +11,10 @@ export interface MovieDocument extends Document {
 
 
 const movieSchema = new Schema<MovieDocument>({
-    // saved book id from GoogleBooks
     movieId: {
         type: String,
         required: true,
+        unique: true
     },
     title: {
         type: String,
@@ -37,7 +37,6 @@ const movieSchema = new Schema<MovieDocument>({
 
 });
 
-// we want model type, not just the schema
 const Movie = model<MovieDocument>('Movie', movieSchema);
 
 export default Movie;
