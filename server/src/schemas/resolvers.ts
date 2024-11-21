@@ -187,6 +187,22 @@ const resolvers = {
       }
       throw new AuthenticationError('You need to be logged in!');
     },
+    saveSeenItMovie: async (_: any, { input }: AddMovieArgs, context: Context) => {
+      if (context.user) {
+        const newMovie = await Movie.create(input);
+    
+        await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { seenItMovies: newMovie.movieId } },
+          { new: true }
+        );
+    
+        console.log('New seenIt movie:', newMovie);
+    
+        return newMovie;
+      }
+      throw new AuthenticationError('You need to be logged in!');
+    }
   },
 };
 

@@ -55,3 +55,15 @@ export const SAVE_NEXT_UP_MOVIE = gql`
     }
   }
 `;
+export const SAVE_SEEN_IT_MOVIE = gql`
+  mutation saveSeenItMovie($input: MovieInput!) {
+    saveSeenItMovie(input: $input) {
+      movieId
+      title
+      overview
+      posterPath
+      releaseDate
+      voteAverage
+    }
+  }
+`;

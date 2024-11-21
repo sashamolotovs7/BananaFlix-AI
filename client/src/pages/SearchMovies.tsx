@@ -1,9 +1,14 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useMutation } from '@apollo/client';
-import { saveNextUpMovieIds, getNextUpMovieIds } from '../utils/localStorage';
+import { 
+  saveNextUpMovieIds,
+  getNextUpMovieIds,
+  saveSeenItMovieIds,
+  getSeenItMovieIds
+} from '../utils/localStorage';
 import type { Movie } from '../models/Movie';
 import { searchMovies } from '../utils/API';
-import { SAVE_NEXT_UP_MOVIE } from '../utils/mutations';
+import { SAVE_NEXT_UP_MOVIE, SAVE_SEEN_IT_MOVIE } from '../utils/mutations';
 import './SearchMovies.css';
 
 
@@ -13,6 +18,7 @@ const SearchMovies = () => {
   const [searchedMovies, setSearchedMovies] = useState<Movie[]>([]);
   const [searchInput, setSearchInput] = useState('');
   const [savedNextUpMovieIds, setSavedNextUpMovieIds] = useState<string[]>(getNextUpMovieIds());
+  const [savedSeenItMovieIds, setSavedSeenItMovieIds] = useState<string[]>(getSeenItMovieIds());
   const [expanded, setExpanded] = useState<number | null>(null);
 
   const toggleExpanded = (id: number) => {
@@ -20,10 +26,12 @@ const SearchMovies = () => {
   };
 
   const [saveNextUpMovie] = useMutation(SAVE_NEXT_UP_MOVIE);
+  const [saveSeenItMovie] = useMutation(SAVE_SEEN_IT_MOVIE);
 
   useEffect(() => {
     saveNextUpMovieIds(savedNextUpMovieIds);
-  }, [savedNextUpMovieIds]);
+    saveSeenItMovieIds(savedSeenItMovieIds);
+  }, [savedNextUpMovieIds, savedSeenItMovieIds]);
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -69,6 +77,26 @@ const SearchMovies = () => {
       setSavedNextUpMovieIds([...savedNextUpMovieIds, movie.id.toString()]);
     } catch (error) {
       console.error('Error saving movie to Next Up:', error);
+    }
+  };
+
+  const handleSaveSeenIt = async (movie: Movie) => {
+    if (savedSeenItMovieIds.includes(movie.id.toString())) return;
+
+    const details = {
+      movieId: movie.id,
+      title: movie.title,
+      overview: movie.overview,
+      posterPath: movie.posterPath,
+      releaseDate: movie.releaseDate,
+      voteAverage: movie.voteAverage,
+    };
+
+    try {
+      await saveSeenItMovie({ variables: { input: details } });
+      setSavedSeenItMovieIds([...savedSeenItMovieIds, movie.id.toString()]);
+    } catch (error) {
+      console.error('Error saving movie to Seen It:', error);
     }
   };
 
@@ -157,8 +185,14 @@ const SearchMovies = () => {
                         ? 'Added to Next Up'
                         : 'Add to Next Up'}
                     </button>
-                    <button className="btn btn-outline-secondary btn-sm">
-                      Seen It
+                    <button
+                      className="btn btn-outline-secondary btn-sm"
+                      onClick={() => handleSaveSeenIt(movie)}
+                      disabled={savedSeenItMovieIds.includes(movie.id.toString())}
+                    >
+                      {savedSeenItMovieIds.includes(movie.id.toString())
+                        ? 'Seen It'
+                        : 'Mark as Seen'}
                     </button>
                   </div>
                 </div>

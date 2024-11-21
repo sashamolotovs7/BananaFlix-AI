@@ -52,7 +52,7 @@ const typeDefs = gql`
     email: String!
     savedMovies: [Movie]
     nextUpMovies: [String]
-    seenMovies: [String]
+    seenItMovies: [String]
     movieRatings: [MovieRating]
   }
 
@@ -100,6 +100,7 @@ const typeDefs = gql`
     login(email: String!, password: String!): Auth
     addUser(input: UserInput!): Auth
     saveNextUpMovie(input: MovieInput!): Movie
+    saveSeenItMovie(input: MovieInput!): Movie
     removeMovie(movieId: String!): User
     rateMovie(movieId: String!, rating: Float!): User
   }
