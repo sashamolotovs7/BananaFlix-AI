@@ -17,18 +17,6 @@ interface Context {
 const TMDB_API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
-// Define the AddMovieArgs interface
-interface AddMovieArgs {
-  input: {
-    movieId: string;
-    title: string;
-    overview: string;
-    posterPath: string;
-    releaseDate: string;
-    voteAverage: number;
-  };
-}
-
 const resolvers = {
   Query: {
     me: async (_: unknown, __: unknown, context: Context) => {
@@ -46,7 +34,6 @@ const resolvers = {
       );
       const { results } = await response.json();
 
-      // Transform the data
       return results.map((movie: any) => ({
         adult: movie.adult,
         backdropPath: movie.backdrop_path,
@@ -77,7 +64,6 @@ const resolvers = {
       );
       const { results } = await response.json();
 
-      // Transform the data
       return results.map((show: any) => ({
         adult: show.adult,
         backdropPath: show.backdrop_path,
@@ -123,8 +109,6 @@ const resolvers = {
       return { token, user };
     },
 
-    
-
     removeMovie: async (_: any, { movieId }: { movieId: string }, context: Context) => {
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
@@ -142,7 +126,6 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
 
-
     rateMovie: async (_: any, { movieId, rating }: { movieId: string; rating: number }, context: Context) => {
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
@@ -158,7 +141,6 @@ const resolvers = {
           }
         );
 
-        // If rating does not exist, add a new rating entry
         if (!updatedUser) {
           throw new Error("Couldn't update the rating");
         }
@@ -168,25 +150,57 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    saveNextUpMovie: async (_: any, { input }: AddMovieArgs, context: Context) => {
-      if (context.user) {
-        // Create a new movie document using the Movie model
-        const newMovie = await Movie.create(input);
+    async saveNextUpMovie(_ : unknown, { input } : any, context : Context) {
+      if (!context.user) throw new AuthenticationError('You must be logged in.');
     
-        // Update the user's nextUpMovies array with the new movie's ID
-        await User.findOneAndUpdate(
-          { _id: context.user._id },
-          { $addToSet: { nextUpMovies: newMovie.movieId } }, // Add the movie's ID to nextUpMovies
-          { new: true }
-        );
+      const { movieId, title, overview, posterPath, releaseDate, voteAverage } = input;
     
-        console.log('New movie:', newMovie);
-    
-        // Return the new movie object
-        return newMovie;
+      let movie = await Movie.findOne({ movieId });
+      if (!movie) {
+        movie = await Movie.create({
+          movieId,
+          title,
+          overview,
+          posterPath,
+          releaseDate,
+          voteAverage,
+        });
       }
-      throw new AuthenticationError('You need to be logged in!');
+    
+      const user = await User.findByIdAndUpdate(
+        context.user._id,
+        { $addToSet: { nextUpMovies: movie._id } },
+        { new: true }
+      ).populate('nextUpMovies');
+    
+      return user;
     },
+
+    async saveSeenItMovie(_ : unknown, { input }: any, context: Context) {
+      if (!context.user) throw new AuthenticationError('You must be logged in.');
+    
+      const { movieId, title, overview, posterPath, releaseDate, voteAverage } = input;
+    
+      let movie = await Movie.findOne({ movieId });
+      if (!movie) {
+        movie = await Movie.create({
+          movieId,
+          title,
+          overview,
+          posterPath,
+          releaseDate,
+          voteAverage,
+        });
+      }
+    
+      const user = await User.findByIdAndUpdate(
+        context.user._id,
+        { $addToSet: { seenItMovies: movie._id } },
+        { new: true }
+      ).populate('seenItMovies');
+    
+      return user;
+    }
   },
 };
 

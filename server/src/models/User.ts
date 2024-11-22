@@ -1,7 +1,5 @@
-import { Schema, model, type Document } from 'mongoose';
+import { Schema, Types, model, type Document } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { MovieDocument } from './Movie';
-
 
 export interface UserDocument extends Document {
   id: string;
@@ -9,7 +7,8 @@ export interface UserDocument extends Document {
   email: string;
   password: string;
   isCorrectPassword(password: string): Promise<boolean>;
-  nextUp: [MovieDocument];
+  nextUpMovies: [{ type: Types.ObjectId, ref: 'Movie' }];
+  seenItMovies: [{ type: Types.ObjectId, ref: 'Movie' }];
 }
 
 const userSchema = new Schema<UserDocument>(
@@ -29,19 +28,17 @@ const userSchema = new Schema<UserDocument>(
       type: String,
       required: true,
     },
-    nextUp: {
-      type: [{ type: Schema.Types.ObjectId, ref: 'Movie' }],
-    }
+    nextUpMovies: [{ type: Schema.Types.ObjectId, ref: 'Movie' }], 
+    seenItMovies: [{ type: Schema.Types.ObjectId, ref: 'Movie' }],
   },
-  // set this to use virtual below
   {
     toJSON: {
       virtuals: true,
     },
+    timestamps: true,
   }
 );
 
-// hash user password
 userSchema.pre('save', async function (next) {
   if (this.isNew || this.isModified('password')) {
     const saltRounds = 10;
@@ -51,15 +48,9 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// custom method to compare and validate password for logging in
 userSchema.methods.isCorrectPassword = async function (password: string) {
   return await bcrypt.compare(password, this.password);
 };
-
-// when we query a user, we'll also get another field called `bookCount` with the number of saved books we have
-// userSchema.virtual('bookCount').get(function () {
-//   return this.savedBooks.length;
-// });
 
 const User = model<UserDocument>('User', userSchema);
 

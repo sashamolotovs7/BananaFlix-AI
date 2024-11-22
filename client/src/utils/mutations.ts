@@ -1,6 +1,5 @@
 import { gql } from '@apollo/client';
 
-// Mutation for logging in a user
 export const LOGIN_USER = gql`
   mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -13,7 +12,6 @@ export const LOGIN_USER = gql`
   }
 `;
 
-// Mutation for adding a new user (signup)
 export const ADD_USER = gql`
   mutation addUser($input: UserInput!) {
     addUser(input: $input) {
@@ -25,9 +23,6 @@ export const ADD_USER = gql`
     }
   }
 `;
-
-
-
 
 export const REMOVE_BOOK = gql`
   mutation removeBook($bookId: ID!) {
@@ -42,16 +37,32 @@ export const REMOVE_BOOK = gql`
   }
 `;
 
-// Mutation for saving a movie to the next up list
 export const SAVE_NEXT_UP_MOVIE = gql`
   mutation saveNextUpMovie($input: MovieInput!) {
     saveNextUpMovie(input: $input) {
-      movieId
-      title
-      overview
-      posterPath
-      releaseDate
-      voteAverage
+      nextUpMovies {
+        movieId
+        title
+        overview
+        posterPath
+        releaseDate
+        voteAverage
+      }
+    }
+  }
+`;
+
+export const SAVE_SEEN_IT_MOVIE = gql`
+  mutation saveSeenItMovie($input: MovieInput!) {
+    saveSeenItMovie(input: $input) {
+      seenItMovies {
+        movieId
+        title
+        overview
+        posterPath
+        releaseDate
+        voteAverage
+      }
     }
   }
 `;
