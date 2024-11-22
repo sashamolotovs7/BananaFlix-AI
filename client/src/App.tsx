@@ -13,6 +13,7 @@ import Navbar from './components/NavBar';
 import Landing from './pages/Landing';
 import SearchMovies from './pages/SearchMovies';
 import Trending from './pages/Trending';
+import Footer from './components/Footer';
 // import Saved from './pages/Saved';
 
 // Construct our main GraphQL API endpoint
@@ -65,6 +66,7 @@ function App() {
           <Route path="/trending" element={<Trending />} />
           {/* <Route path="/saved" element={<Saved />} /> */}
         </Routes>
+        <Footer />
       </>
     </ApolloProvider>
   );
