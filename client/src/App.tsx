@@ -14,6 +14,8 @@ import Landing from './pages/Landing';
 import SearchMovies from './pages/SearchMovies';
 import Trending from './pages/Trending';
 import ListsNextSeen from './pages/ListsNextSeen';
+import Footer from './components/Footer';
+// import Saved from './pages/Saved';
 
 // Construct our main GraphQL API endpoint
 const httpLink = createHttpLink({
@@ -65,6 +67,7 @@ function App() {
           <Route path="/trending" element={<Trending />} />
           <Route path="/lists-next-seen" element={<ListsNextSeen />} />
         </Routes>
+        <Footer />
       </>
     </ApolloProvider>
   );
