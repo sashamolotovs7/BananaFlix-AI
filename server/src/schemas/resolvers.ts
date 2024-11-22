@@ -21,7 +21,9 @@ const resolvers = {
   Query: {
     me: async (_: unknown, __: unknown, context: Context) => {
       if (!context.user) throw new AuthenticationError('Could not find user');
-      return await User.findOne({ _id: context.user._id });
+      return await User.findOne({ _id: context.user._id })
+      .populate('nextUpMovies')
+      .populate('seenItMovies');
     },
     trendingMovies: async () => {
       const response = await fetch(
