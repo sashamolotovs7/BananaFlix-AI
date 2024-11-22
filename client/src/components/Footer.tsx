@@ -16,7 +16,7 @@ const Footer = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer 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`, // Replace with your OpenAI API key
+            'Authorization': `Bearer key`, // Replace with your OpenAI API key
           },
           body: JSON.stringify({
             model: 'gpt-3.5-turbo', // or the model you want to use
