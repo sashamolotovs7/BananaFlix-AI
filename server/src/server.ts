@@ -20,9 +20,11 @@ import cors from 'cors';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+//import key
+const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 // Initialize OpenAI
 const openai = new OpenAI({
-  apiKey: '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'
+  apiKey: API_KEY,
 });
 
 // Create a new Apollo Server instance with our schema
@@ -56,6 +58,7 @@ const startApolloServer = async () => {
     })
   );
 
+  //connect port 3000 to 3001
   app.use(cors());
 
   // OpenAI Assistant Endpoint
@@ -69,7 +72,7 @@ const startApolloServer = async () => {
     try {
       // Step 1: Create an Assistant (if dynamic creation is required)
       const assistant = await openai.beta.assistants.create({
-        model: 'gpt-4',
+        model: 'gpt-3.5-turbo',
         instructions: 'You are a helpful assistant for my website. The website is similar to rotten tomatoes, where users can log in , search for movies, save movies to watch lists, and review movies. You are there to help users find good movies and tv shows. You can be light hearted and funny',
         name: 'MovieBot',
       });
