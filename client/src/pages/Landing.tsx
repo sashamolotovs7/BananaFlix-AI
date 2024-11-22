@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import poster from "../assets/bananaFlix.jpg";
 import './Landing.css';
 

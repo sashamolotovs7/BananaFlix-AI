@@ -1,8 +1,7 @@
-// BananaFlix/client/src/components/Footer.tsx
-import { useState } from 'react';
+import { useState } from "react";
 
 const Footer = () => {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -10,44 +9,42 @@ const Footer = () => {
     if (message.trim()) {
       setChatHistory((prev) => [...prev, `User: ${message}`]);
       setLoading(true);
-      
+  
       try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch('http://localhost:3001/api/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer key`, // Replace 
           },
-          body: JSON.stringify({
-            model: 'gpt-3.5-turbo', // or the model you want to use
-            messages: [{ role: 'user', content: message }],
-          }),
+          body: JSON.stringify({ message }),
         });
-
-        const data = await response.json();
-        console.log(data); // Log the entire response for debugging
-
-        // Check if choices exist and have at least one element
-        if (data.choices && data.choices.length > 0) {
-          const botMessage = data.choices[0].message.content;
-          setChatHistory((prev) => [...prev, `Bot: ${botMessage}`]);
-        } else {
-          setChatHistory((prev) => [...prev, 'Bot: Sorry, I did not receive a valid response.']);
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+  
+        const data = await response.json();
+        console.log('API Response:', data);
+  
+        // Extract the message content depending on your response structure
+        const botMessage = data.response || 'Bot: No response received.';
+  
+        setChatHistory((prev) => [...prev, `Bot: ${botMessage}`]);
       } catch (error) {
-        console.error('Error fetching data from OpenAI:', error);
-        setChatHistory((prev) => [...prev, 'Bot: Sorry, I could not process your request.']);
+        console.error('Error fetching data from API:', error);
+        setChatHistory((prev) => [...prev, 'Bot: Error connecting to server.']);
       } finally {
         setLoading(false);
         setMessage('');
       }
     }
   };
+  
 
   return (
-    <footer style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
+    <footer style={{ padding: "20px", backgroundColor: "#f8f9fa" }}>
       <h3>Chat with us!</h3>
-      <div style={{ maxHeight: '200px', overflowY: 'scroll', border: '1px solid #ccc', padding: '10px' }}>
+      <div style={{ maxHeight: "200px", overflowY: "scroll", border: "1px solid #ccc", padding: "10px" }}>
         {chatHistory.map((chat, index) => (
           <div key={index}>{chat}</div>
         ))}
@@ -59,7 +56,12 @@ const Footer = () => {
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Ask me anything..."
       />
-      <button onClick={handleSendMessage} disabled={loading}>Send</button>
+      <button onClick={handleSendMessage} disabled={loading}>
+        Send
+      </button>
+      <p style={{ fontSize: "0.8rem", color: "#666" }}>
+        Note: This chatbot is powered by OpenAI's Assistant feature.
+      </p>
     </footer>
   );
 };
