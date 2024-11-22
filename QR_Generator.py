@@ -16,9 +16,9 @@ os.makedirs(qr_image_directory, exist_ok=True)
 # Here you can generate QR codes by defining the url and filename
 # The QR code will be saved in the "client/src/assets" directory
 qr_codes = [
-    {"content": "git@github.com:bmw-dev0p/BananaFlix.git", "filename": "GitHub_BananaFlix_QR.png"},
-    {"content": "https://bananaflix.onrender.com/", "filename": "BananaFlix_Site_QR.png"},
-    {"content": "https://docs.google.com/presentation/d/14orPGbxQocfxTU0-85zaSroy88kXk9IbeBiFUTAvj7Q/edit#slide=id.p", "filename": "GoogleSheets_Presentation.png"},
+    {"content": "git@github.com:bmw-dev0p/BananaFlix.git", "filename": "GitHub_BananaFlix_Repo.png"},
+    {"content": "https://bananaflix.onrender.com", "filename": "BananaFlix_onRender.png"},
+    {"content": "https://docs.google.com/presentation/d/14orPGbxQocfxTU0-85zaSroy88kXk9IbeBiFUTAvj7Q/edit?usp=sharing", "filename": "BananaFlix_Presentation.png"},
 ]
 
 # Generate and save each QR code
