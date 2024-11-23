@@ -1,0 +1,174 @@
+/* bananabot text  */
+.chat-h1 { 
+    text-align: center;
+    color: #b2cbd1;
+}
+
+/* General styles for the chat popup */
+.box-sizing {
+    box-sizing: border-box;
+}
+
+.chat-history {
+    flex-grow: 1; /* Use remaining space from parent flex */    
+    height: 60%; /* Fixed height relative to container */    
+    overflow-y: scroll; /* Enable vertical scrolling when chat window fills */
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background-color: #b2cbd1;
+}
+
+/* The popup chat - initially hidden */
+.popup-container {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 2%; /* Position the popup at the bottom of the screen */
+    right: 0.5%; /* Position from the right */
+    border: 3px solid #000000;
+    z-index: 9; /* Stay on top of other elements */
+    height: 91vh; /* entire popup height */
+    width: 500px; /* popup width */
+    overflow: hidden; /* Ensure no overflow issues */
+    box-shadow: 0 20px 20px rgba(0, 0, 0, 0.7); /* Add shadow */
+    border-radius: 8px;
+}
+
+/* Form container styling */
+.form-container {
+    display: flex;
+    flex-direction: column; /* Stack textarea and buttons */    
+    flex-grow: 1;
+    padding: 10px;
+    background-color: #222529;
+}
+
+/* Full-width textarea */
+.user-input {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    border: none;
+    background: #b2cbd1;
+    resize: none;
+    min-height: 100px;
+    border-radius: 4px;
+}
+
+/* Focus effect for textarea */
+.user-input:focus {
+    background-color: #cdd7e3;
+    outline: none;
+}
+
+
+/* BUTTONS */
+/* OPEN CHAT BUTTON  */
+.open-btn {
+    all: unset;
+    width: 230px;
+    height: 40px;
+    font-size: 19px;
+    background: transparent;
+    border: none;
+    position: fixed;
+    bottom: 23px;
+    right: 28px;
+    color: #f0f0f0;
+    cursor: pointer;
+    z-index: 1;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+
+}
+
+.open-btn::after,
+.open-btn::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: -99999;
+    transition: all .4s;
+}
+
+.open-btn::before {
+    transform: translate(0%, 0%);
+    width: 100%;
+    height: 100%;
+    background: #28282d;
+    border-radius: 10px;
+}
+
+.open-btn::after {
+    transform: translate(10px, 10px);
+    width: 35px;
+    height: 35px;
+    background: #ffffff15;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 50px;
+}
+
+.open-btn:hover::before {
+    transform: translate(5%, 20%);
+    width: 110%;
+    height: 110%;
+}
+
+.open-btn:hover::after {
+    border-radius: 10px;
+    transform: translate(0, 0);
+    width: 100%;
+    height: 100%;
+}
+
+.open-btn:active::after {
+    transition: 0s;
+    transform: translate(0, 5%);
+}
+
+/* Submit button */
+.submit-btn {
+    background-color: #04aa6d;
+    color: white;
+    padding: 16px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+    opacity: 0.8;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+/* Cancel button */
+.cancel-btn {
+    background-color: red;
+    color: white;
+    padding: 16px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+    opacity: 0.8;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+/* Hover effect for buttons */
+.submit-btn:hover {
+    opacity: 1;
+}
+.cancel-btn:hover {
+    opacity: 1;
+}
+

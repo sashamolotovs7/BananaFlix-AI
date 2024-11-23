@@ -1,68 +1,98 @@
 import { useState } from "react";
+import "./Footer.css"; // Import the CSS for the chat popup
 
 const Footer = () => {
-  const [message, setMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState(""); // State to hold the current message input by the user
+  const [chatHistory, setChatHistory] = useState<string[]>([]); // State to store the chat history
+  const [loading, setLoading] = useState(false); // State to indicate if the bot is currently responding
+  const [isOpen, setIsOpen] = useState(false); // State to toggle the visibility of the chat popup
 
-  const handleSendMessage = async () => {
-    if (message.trim()) {
-      setChatHistory((prev) => [...prev, `User: ${message}`]);
-      setLoading(true);
-  
+  // Function to send message to bot and receive response
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent form submission from refreshing the page
+    if (message.trim()) { // Check if the message is not just whitespace
+      setChatHistory((prev) => [...prev, `User: ${message}`]); // Add the user's message to chat history
+      setLoading(true); // Set loading state to true while waiting for the bot's response
+
       try {
-        const response = await fetch('http://localhost:3001/api/chat', {
-          method: 'POST',
+        // Send the user's message to the server
+        const response = await fetch("http://localhost:3001/api/chat", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message }),
+          body: JSON.stringify({ message }), // Send the message as JSON
         });
-  
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+
+        if (!response.ok) { // Check if the response is not OK
+          throw new Error(`HTTP error! status: ${response.status}`); // Throw an error if the response is not OK
         }
-  
-        const data = await response.json();
-        console.log('API Response:', data);
-  
-        // Extract the message content depending on your response structure
-        const botMessage = data.response || 'Bot: No response received.';
-  
-        setChatHistory((prev) => [...prev, `Bot: ${botMessage}`]);
+
+        const data = await response.json(); // Parse the JSON response
+        console.log(`bot response received: ${data}`); // Check the response data
+        const botMessage = data.response || "Bot: No response received."; // Assign the bot's message or a default message
+
+        setChatHistory((prev) => [...prev, `Bot: ${botMessage}`]); // Add the bot's message to chat history
       } catch (error) {
-        console.error('Error fetching data from API:', error);
-        setChatHistory((prev) => [...prev, 'Bot: Error connecting to server.']);
+        console.error("Error fetching data from API:", error); // Log any errors 
+        setChatHistory((prev) => [...prev, "Bot: Error connecting to server."]); // Add an error message to chat history
       } finally {
-        setLoading(false);
-        setMessage('');
+        setLoading(false); // Reset loading state
+        setMessage(""); // Clear the message input field
       }
     }
   };
-  
 
   return (
-    <footer style={{ padding: "20px", backgroundColor: "#f8f9fa" }}>
-      <h3>Chat with us!</h3>
-      <div style={{ maxHeight: "200px", overflowY: "scroll", border: "1px solid #ccc", padding: "10px" }}>
-        {chatHistory.map((chat, index) => (
-          <div key={index}>{chat}</div>
-        ))}
-        {loading && <div>Bot: Typing...</div>}
-      </div>
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Ask me anything..."
-      />
-      <button onClick={handleSendMessage} disabled={loading}>
-        Send
+    <div className="chat-footer">
+      {/* Button to open the chat popup */}
+      <button className="open-btn" onClick={() => {
+        console.log("Chat button clicked!"); // check for click
+        setIsOpen(true)
+        }}>
+        Chat with BananaBot! 🤖
       </button>
-      <p style={{ fontSize: "0.8rem", color: "#666" }}>
-        Note: This chatbot is powered by OpenAI's Assistant feature.
-      </p>
-    </footer>
+
+      {/* Chat popup */}
+      {isOpen && (
+        <div className="popup-container" id="chatbot">
+          <form className="form-container" onSubmit={handleSendMessage}>
+            <h1 className="chat-h1">🍌BananaBot🍌 </h1>
+
+            <div className="chat-history">
+              {chatHistory.map((chat, index) => (
+                <div key={index}>{chat}</div> // Display each chat message
+              ))}
+              {/* loading message if bot is responding */}
+              {loading && <div>Bot: Typing...</div>} 
+            </div>
+
+            <label htmlFor="msg">
+              <b>Message</b>
+            </label>
+            <textarea
+              className="user-input"
+              placeholder="Type your a-peeling message here..." // Placeholder text for the textarea
+              value={message} // Bind the textarea value to the message state
+              onChange={(e) => setMessage(e.target.value)} // Update message state on input change
+              name="msg"
+              required // Make the textarea required
+            />
+
+            <button type="submit" className="submit-btn">
+              Send
+            </button>
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={() => setIsOpen(false)} // Close the chat popup
+            >
+              Close
+            </button>
+          </form>
+        </div>
+      )}
+    </div>
   );
 };
 

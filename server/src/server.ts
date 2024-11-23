@@ -73,7 +73,7 @@ const startApolloServer = async () => {
       // Step 1: Create an Assistant (if dynamic creation is required)
       const assistant = await openai.beta.assistants.create({
         model: 'gpt-3.5-turbo',
-        instructions: 'You are a helpful assistant for my website. The website is similar to rotten tomatoes, where users can log in , search for movies, save movies to watch lists, and review movies. You are there to help users find good movies and tv shows. You can be light hearted and funny',
+        instructions: 'You are a helpful assistant for my website. The website is Banana themed, where users can log in , search for movies, save movies to watch lists, and review movies. You are there to help users find good movies and tv shows. You can be light hearted and funny. Insert banana puns whenever possible',
         name: 'MovieBot',
       });
       console.log('Assistant created:', assistant.id);
@@ -113,6 +113,7 @@ const startApolloServer = async () => {
         // Fetch messages from the thread
         const messages = await openai.beta.threads.messages.list(thread.id);
         console.log('Messages retrieved:', messages.data);
+        // hell of a path to get to the string from response object
         const botResponse = messages.data[0]?.content.find((msg) => msg.type === 'text')?.text?.value || 'No response received.';
         console.log('Bot response:', botResponse);
         return res.json({ response: botResponse });
