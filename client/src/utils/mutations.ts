@@ -66,3 +66,25 @@ export const SAVE_SEEN_IT_MOVIE = gql`
     }
   }
 `;
+export const GET_USER_MOVIE_LISTS = gql`
+  query getUserMovieLists {
+    me {
+      nextUpMovies {
+        _id
+        title
+        overview
+        posterPath
+        releaseDate
+        voteAverage
+      }
+      seenItMovies {
+        _id
+        title
+        overview
+        posterPath
+        releaseDate
+        voteAverage
+      }
+    }
+  }
+`;

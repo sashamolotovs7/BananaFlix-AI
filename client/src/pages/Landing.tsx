@@ -1,6 +1,8 @@
 // import React from 'react';
+import { useEffect } from "react";
 import poster from "../assets/bananaFlix.jpg";
 import './Landing.css';
+import Auth from "../utils/auth";
 
 // interface LandingProps {
 //     setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -14,6 +16,13 @@ const Landing = ({
     setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
     setActiveTab: React.Dispatch<React.SetStateAction<string>>;
 }) => {
+    // Redirect if user is already logged in
+    useEffect(() => {
+      if (Auth.loggedIn()) {
+        window.location.href = "/trending";
+      }
+    }, []);
+    
     return (
         <div className="container1">
             <img className="poster" src={poster} alt="banana-poster" />
@@ -47,3 +56,4 @@ const Landing = ({
 };
 
 export default Landing;
+

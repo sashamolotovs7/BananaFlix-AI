@@ -6,6 +6,7 @@ import App from './App.jsx';
 import Landing from './pages/Landing';
 import Trending from './pages/Trending';
 import SearchMovies from './pages/SearchMovies';
+import ListsNextSeen from './pages/ListsNextSeen.js';
 // import SignupForm from './components/SignupForm'
 // import LoginForm from './components/LoginForm'
 
@@ -27,6 +28,9 @@ const router = createBrowserRouter([
         path:'/search',
         element: <SearchMovies />
       },
+      {path:'/lists-next-seen',
+      element: <ListsNextSeen />
+      }
       // {
       //   path: '/signup',
       //   element: <SignupForm handleModalClose={() =>  setShowModal(false) } />

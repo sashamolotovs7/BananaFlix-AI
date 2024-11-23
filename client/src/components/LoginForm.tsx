@@ -1,5 +1,5 @@
 // see SignupForm.js for comments
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
 // import { loginUser } from '../utils/API'; // no longer needed
@@ -18,6 +18,7 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [login] = useMutation(LOGIN_USER); //added mutation
 
+  
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
@@ -40,6 +41,7 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
 
       if (data && data.login && data.login.token) {
         Auth.login(data.login.token);
+        window.location.href = '/trending';
       } else {
         throw new Error('Login failed');
       }
