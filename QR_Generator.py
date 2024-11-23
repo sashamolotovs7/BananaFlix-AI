@@ -18,7 +18,7 @@ os.makedirs(qr_image_directory, exist_ok=True)
 qr_codes = [
     {"content": "git@github.com:bmw-dev0p/BananaFlix.git", "filename": "GitHub_BananaFlix_Repo.png"},
     {"content": "https://bananaflix.onrender.com", "filename": "BananaFlix_onRender.png"},
-    {"content": "https://docs.google.com/presentation/d/14orPGbxQocfxTU0-85zaSroy88kXk9IbeBiFUTAvj7Q/edit?usp=sharing", "filename": "BananaFlix_Presentation.png"},
+    {"content": "https://1drv.ms/p/c/b061a3b514ff032c/ES_ka4InYDpAjCYhVYKfCcwBw2QCY7qWRDscaw36RZpRzw?e=IXMUvd", "filename": "BananaFlix_Presentation.png"},
 ]
 
 # Generate and save each QR code
