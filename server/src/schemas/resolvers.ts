@@ -19,9 +19,13 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 
 const resolvers = {
   Query: {
-    me: async (_: unknown, __: unknown, context: Context) => {
-      if (!context.user) throw new AuthenticationError('Could not find user');
-      return await User.findOne({ _id: context.user._id });
+    me: async (_: unknown, { filter }: { filter?: { type: string } }, context: Context) => {
+      if (!context.user) throw new AuthenticationError('You must be logged in');
+
+      const filters = filter ? { /* Add filtering logic */ } : {};
+      return await User.findOne({ _id: context.user._id })
+        .populate({ path: 'nextUpMovies', match: filters })
+        .populate({ path: 'seenItMovies', match: filters });
     },
     trendingMovies: async () => {
       const response = await fetch(

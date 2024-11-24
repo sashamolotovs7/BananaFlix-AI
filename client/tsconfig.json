@@ -26,6 +26,6 @@
       "*": ["node_modules/*"]
     }
   },
-  "include": ["src", "../server/src/utils/seeds.ts"],
+  "include": ["src", "../server/src/utils/seeds.ts", "../server/src/config/ai-assist.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

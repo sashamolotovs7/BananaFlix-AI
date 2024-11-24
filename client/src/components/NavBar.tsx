@@ -1,4 +1,4 @@
-import React from 'react';
+// import React from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, Container, Modal, Tab } from 'react-bootstrap';
 import Auth from '../utils/auth';
@@ -33,7 +33,7 @@ const AppNavbar = ({
               {/* If user is logged in, show saved movies and logout, else show login/signup */}
               {Auth.loggedIn() ? (
                 <>
-                  <Nav.Link as={Link} to="/saved">See Your Movies</Nav.Link>
+                  <Nav.Link as={Link} to="/lists-next-seen">My Movie Lists</Nav.Link>
                   <Nav.Link onClick={Auth.logout}>Logout</Nav.Link>
                 </>
               ) : (
