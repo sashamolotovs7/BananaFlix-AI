@@ -49,7 +49,7 @@ const Footer = () => {
       <button className="open-btn" onClick={() => {
         console.log("Chat button clicked!"); // check for click
         setIsOpen(true)
-        }}>
+      }}>
         Chat with BananaBot! 🤖
       </button>
 
@@ -60,12 +60,21 @@ const Footer = () => {
             <h1 className="chat-h1">🍌BananaBot🍌 </h1>
 
             <div className="chat-history">
-              {chatHistory.map((chat, index) => (
-                <div key={index}>{chat}</div> // Display each chat message
-              ))}
-              {/* loading message if bot is responding */}
-              {loading && <div>Bot: Typing...</div>} 
+              {/* maps over the chatHistory array to render each chat message */}
+              {chatHistory.map((chat, index) => {
+                // Separate the speaker (User/Bot) and the message
+                const [speaker, ...messageParts] = chat.split(": ");
+                const message = messageParts.join(": ");
+                return (
+                  <div key={index}>
+                    {/* enabled bold text (User/Bot) and regular text (message) for readability */}
+                    <strong>{speaker}:</strong> {message}
+                  </div>
+                );
+              })}
+              {loading && <div><strong>Bot:</strong> Typing...</div>}
             </div>
+
 
             <label htmlFor="msg">
               <b>Message</b>
