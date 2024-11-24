@@ -19,6 +19,7 @@ qr_codes = [
     {"content": "git@github.com:bmw-dev0p/BananaFlix.git", "filename": "GitHub_BananaFlix_Repo.png"},
     {"content": "https://bananaflix.onrender.com", "filename": "BananaFlix_onRender.png"},
     {"content": "https://1drv.ms/p/c/b061a3b514ff032c/ES_ka4InYDpAjCYhVYKfCcwBw2QCY7qWRDscaw36RZpRzw?e=IXMUvd", "filename": "BananaFlix_Presentation.png"},
+
 ]
 
 # Generate and save each QR code
