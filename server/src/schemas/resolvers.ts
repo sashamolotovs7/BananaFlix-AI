@@ -154,21 +154,14 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    async saveNextUpMovie(_ : unknown, { input } : any, context : Context) {
+    async saveNextUpMovie(_: unknown, { input }: any, context: Context) {
       if (!context.user) throw new AuthenticationError('You must be logged in.');
     
       const { movieId, title, overview, posterPath, releaseDate, voteAverage } = input;
     
       let movie = await Movie.findOne({ movieId });
       if (!movie) {
-        movie = await Movie.create({
-          movieId,
-          title,
-          overview,
-          posterPath,
-          releaseDate,
-          voteAverage,
-        });
+        movie = await Movie.create({ movieId, title, overview, posterPath, releaseDate, voteAverage });
       }
     
       const user = await User.findByIdAndUpdate(
@@ -179,22 +172,15 @@ const resolvers = {
     
       return user;
     },
-
-    async saveSeenItMovie(_ : unknown, { input }: any, context: Context) {
+    
+    async saveSeenItMovie(_: unknown, { input }: any, context: Context) {
       if (!context.user) throw new AuthenticationError('You must be logged in.');
     
       const { movieId, title, overview, posterPath, releaseDate, voteAverage } = input;
     
       let movie = await Movie.findOne({ movieId });
       if (!movie) {
-        movie = await Movie.create({
-          movieId,
-          title,
-          overview,
-          posterPath,
-          releaseDate,
-          voteAverage,
-        });
+        movie = await Movie.create({ movieId, title, overview, posterPath, releaseDate, voteAverage });
       }
     
       const user = await User.findByIdAndUpdate(
@@ -204,7 +190,7 @@ const resolvers = {
       ).populate('seenItMovies');
     
       return user;
-    }
+    }    
   },
 };
 

@@ -1,14 +1,14 @@
 import './Trending.css';
-import { gql, useQuery, useMutation } from '@apollo/client';
-import { useState, useEffect } from 'react';
+import { gql, useQuery } from '@apollo/client';
+import { useState } from 'react';
 import { Movie } from '../models/Movie';
 import { TVShow } from '../models/TvShow';
-import { 
-  saveNextUpMovieIds, 
-  getNextUpMovieIds, 
-  saveSeenItMovieIds, 
-  getSeenItMovieIds 
-} from '../utils/localStorage'; // Assuming you have these utility functions
+import {
+  saveNextUpMovieIds,
+  getNextUpMovieIds,
+  saveSeenItMovieIds,
+  getSeenItMovieIds,
+} from '../utils/localStorage';
 
 const TRENDING_MOVIES = gql`
   query GetTrendingMovies {
@@ -44,47 +44,64 @@ function Trending() {
   const { loading: moviesLoading, error: moviesError, data: moviesData } = useQuery(TRENDING_MOVIES);
   const { loading: showsLoading, error: showsError, data: showsData } = useQuery(TRENDING_TV_SHOWS);
 
-  const [expanded, setExpanded] = useState<number | null>(null); // Track expanded movie/show
-
-  // LocalStorage state for Next Up and Seen It
+  const [expanded, setExpanded] = useState<number | null>(null); // Expanded movie/show description
   const [savedNextUpMovieIds, setSavedNextUpMovieIds] = useState<string[]>(getNextUpMovieIds());
   const [savedSeenItMovieIds, setSavedSeenItMovieIds] = useState<string[]>(getSeenItMovieIds());
 
-  // Function to toggle expanded description
   const toggleExpanded = (id: number) => {
-    setExpanded(expanded === id ? null : id); // Toggle the expanded state
+    setExpanded(expanded === id ? null : id);
   };
 
-  // Functions to handle adding to "Next Up" and "Seen It"
-  const handleAddToNextUp = (movie: Movie | TVShow) => {
+  const saveToNextUp = async (movie: Movie | TVShow) => {
     const movieId = movie.id.toString();
-    if (!savedNextUpMovieIds.includes(movieId)) {
+    if (savedNextUpMovieIds.includes(movieId)) return;
+
+    try {
+      const response = await fetch('/api/movies/next-up', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(movie),
+      });
+      if (!response.ok) throw new Error('Failed to save movie to Next Up');
       setSavedNextUpMovieIds((prev) => {
         const updated = [...prev, movieId];
         saveNextUpMovieIds(updated); // Save to local storage
         return updated;
       });
+      console.log('Movie saved to Next Up:', await response.json());
+    } catch (error) {
+      console.error('Error saving movie to Next Up:', error);
     }
   };
 
-  const handleSaveSeenIt = (movie: Movie | TVShow) => {
+  const saveToSeenIt = async (movie: Movie | TVShow) => {
     const movieId = movie.id.toString();
-    if (!savedSeenItMovieIds.includes(movieId)) {
+    if (savedSeenItMovieIds.includes(movieId)) return;
+
+    try {
+      const response = await fetch('/api/movies/seen-it', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(movie),
+      });
+      if (!response.ok) throw new Error('Failed to save movie to Seen It');
       setSavedSeenItMovieIds((prev) => {
         const updated = [...prev, movieId];
         saveSeenItMovieIds(updated); // Save to local storage
         return updated;
       });
+      console.log('Movie saved to Seen It:', await response.json());
+    } catch (error) {
+      console.error('Error saving movie to Seen It:', error);
     }
   };
+
+  const truncateText = (text: string, length: number) =>
+    text.length > length ? `${text.substring(0, length)}...` : text;
 
   if (moviesLoading || showsLoading) return <p>Loading...</p>;
   if (moviesError) return <p>Error loading movies: {moviesError.message}</p>;
   if (showsError) return <p>Error loading TV shows: {showsError.message}</p>;
-
-  const truncateText = (text: string, length: number) => {
-    return text.length > length ? text.substring(0, length) + '...' : text;
-  };
 
   return (
     <div className="container-lg py-5">
@@ -120,27 +137,23 @@ function Trending() {
                 </div>
                 <p className="card-text">
                   <small className="rating text-muted">
-                    {/* Star icon and rating */}
                     Rating: {movie.voteAverage.toFixed(1)}/10
                   </small>
                 </p>
 
                 <div className="d-flex flex-wrap justify-content-center align-items-center gap-1 mt-1">
-                  {/* "Next Up" Button */}
                   <button
                     className="btn btn-outline-primary btn-sm"
-                    onClick={() => handleAddToNextUp(movie)}
+                    onClick={() => saveToNextUp(movie)}
                     disabled={savedNextUpMovieIds.includes(movie.id.toString())}
                   >
                     {savedNextUpMovieIds.includes(movie.id.toString())
                       ? 'Added to Next Up'
                       : 'Add to Next Up'}
                   </button>
-
-                  {/* "Seen It" Button */}
                   <button
                     className="btn btn-outline-secondary btn-sm"
-                    onClick={() => handleSaveSeenIt(movie)}
+                    onClick={() => saveToSeenIt(movie)}
                     disabled={savedSeenItMovieIds.includes(movie.id.toString())}
                   >
                     {savedSeenItMovieIds.includes(movie.id.toString())
@@ -186,27 +199,23 @@ function Trending() {
                 </div>
                 <p className="card-text">
                   <small className="rating text-muted">
-                    {/* Star icon and rating */}
                     Rating: {show.voteAverage.toFixed(1)}/10
                   </small>
                 </p>
 
                 <div className="d-flex flex-wrap justify-content-center align-items-center gap-1 mt-1">
-                  {/* "Next Up" Button */}
                   <button
                     className="btn btn-outline-primary btn-sm"
-                    onClick={() => handleAddToNextUp(show)}
+                    onClick={() => saveToNextUp(show)}
                     disabled={savedNextUpMovieIds.includes(show.id.toString())}
                   >
                     {savedNextUpMovieIds.includes(show.id.toString())
                       ? 'Added to Next Up'
                       : 'Add to Next Up'}
                   </button>
-
-                  {/* "Seen It" Button */}
                   <button
                     className="btn btn-outline-secondary btn-sm"
-                    onClick={() => handleSaveSeenIt(show)}
+                    onClick={() => saveToSeenIt(show)}
                     disabled={savedSeenItMovieIds.includes(show.id.toString())}
                   >
                     {savedSeenItMovieIds.includes(show.id.toString())
@@ -224,4 +233,3 @@ function Trending() {
 }
 
 export default Trending;
-
