@@ -92,3 +92,12 @@
   margin-left: 5px;
   font-size: 18px;
 }
+
+.btn {
+  &:disabled {
+    cursor: not-allowed !important;
+    background-color: #ccc;
+    border-color: #ccc;
+    color: white;
+  }
+}

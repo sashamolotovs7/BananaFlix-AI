@@ -10,6 +10,7 @@ import type { Movie } from '../models/Movie';
 import { searchMovies } from '../utils/API';
 import { SAVE_NEXT_UP_MOVIE, SAVE_SEEN_IT_MOVIE } from '../utils/mutations';
 import './SearchMovies.css';
+import Auth from '../utils/auth';
 
 
 const API_KEY = import.meta.env.VITE_REACT_APP_TMDB_API_KEY;
@@ -179,16 +180,17 @@ const SearchMovies = () => {
                     <button
                       className="btn btn-outline-primary btn-sm"
                       onClick={() => handleAddToNextUp(movie)}
-                      disabled={savedNextUpMovieIds.includes(movie.id.toString())}
+                      disabled={savedNextUpMovieIds.includes(movie.id.toString()) || !Auth.loggedIn()}
                     >
                       {savedNextUpMovieIds.includes(movie.id.toString())
                         ? 'Added to Next Up'
                         : 'Add to Next Up'}
                     </button>
                     <button
+
                       className="btn btn-outline-secondary btn-sm"
                       onClick={() => handleSaveSeenIt(movie)}
-                      disabled={savedSeenItMovieIds.includes(movie.id.toString())}
+                      disabled={savedSeenItMovieIds.includes(movie.id.toString()) || !Auth.loggedIn()}
                     >
                       {savedSeenItMovieIds.includes(movie.id.toString())
                         ? 'Seen It'

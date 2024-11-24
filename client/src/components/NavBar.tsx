@@ -5,8 +5,6 @@ import Auth from '../utils/auth';
 import SignUpForm from './SignupForm';
 import LoginForm from './LoginForm';
 
-
-
 const AppNavbar = ({
   //Properties needed to be passed in for Modal
   showModal,
@@ -25,9 +23,9 @@ const AppNavbar = ({
       <Navbar bg="dark" variant="dark" expand="lg">
         <Container fluid>
           <Navbar.Brand as={Link} to="/">BananaFlix</Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbar" />
-          <Navbar.Collapse id="navbar" className="d-flex flex-row-reverse">
-            <Nav className="ml-auto d-flex">
+          <Navbar.Toggle aria-controls="navbar-nav" />
+          <Navbar.Collapse id="navbar-nav" role="navigation" className='flex-grow-0'>
+            <Nav className="ml-auto d-flex align-items-end">
               <Nav.Link as={Link} to="/search">Search For Movies</Nav.Link>
               <Nav.Link as={Link} to="/trending">Trending</Nav.Link>
               {/* If user is logged in, show saved movies and logout, else show login/signup */}
@@ -37,7 +35,10 @@ const AppNavbar = ({
                   <Nav.Link onClick={Auth.logout}>Logout</Nav.Link>
                 </>
               ) : (
-                <Nav.Link onClick={() => setShowModal(true)}>Login/Sign Up</Nav.Link>
+                <>
+                  <Nav.Link onClick={() => setShowModal(true)}>Login</Nav.Link>
+                  <Nav.Link onClick={() => setShowModal(true)}>Sign Up</Nav.Link>
+                </>
               )}
             </Nav>
           </Navbar.Collapse>
