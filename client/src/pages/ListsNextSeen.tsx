@@ -50,7 +50,7 @@ const ListsNextSeen: React.FC = () => {
     <div className="container-lg py-5">
       {/* Next Up Movies Section */}
       <div className="list-section">
-        <h2 className="mb-4">Next Up Movies</h2>
+        <h2 className="mb-4">Next Up</h2>
         <button
           className="filter-toggle btn btn-outline-primary mb-3"
           onClick={() => setShowNextUpFilter(!showNextUpFilter)}
@@ -143,7 +143,7 @@ const ListsNextSeen: React.FC = () => {
 
       {/* Seen It Movies Section */}
       <div className="list-section seen-it mt-5">
-        <h2 className="mb-4">Seen It Movies</h2>
+        <h2 className="mb-4">Seen It</h2>
         <button
           className="filter-toggle btn btn-outline-primary mb-3"
           onClick={() => setShowSeenItFilter(!showSeenItFilter)}
