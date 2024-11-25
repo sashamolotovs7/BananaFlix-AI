@@ -69,7 +69,7 @@ const SAVE_SEEN_IT_TRENDING = gql`
 function Trending() {
   const { loading: moviesLoading, error: moviesError, data: moviesData } = useQuery(TRENDING_MOVIES);
   const { loading: showsLoading, error: showsError, data: showsData } = useQuery(TRENDING_TV_SHOWS);
-  const [client] = useState(useApolloClient());
+  const client = useApolloClient();
 
   const [expanded, setExpanded] = useState<number | null>(null); 
   const [savedNextUpMovieIds, setSavedNextUpMovieIds] = useState<string[]>(getNextUpMovieIds());
@@ -79,11 +79,12 @@ function Trending() {
     setExpanded(expanded === id ? null : id);
   };
 
-  const saveToNextUp = async (movie: Movie | TVShow) => {
+  const saveToNextUp = async (movie) => {
     const movieId = movie.id.toString();
-    console.log("Attempting to add to Next Up from Trending:", movieId, movie.title || movie.name);
+
+    // Check if the movie is already added
     if (savedNextUpMovieIds.includes(movieId)) {
-      console.log("Movie already in Next Up from Trending:", movieId);
+      console.log(`Movie already in Next Up: ${movieId}`);
       return;
     }
 
@@ -92,23 +93,23 @@ function Trending() {
         mutation: SAVE_NEXT_UP_TRENDING,
         variables: {
           input: {
-            movieId: movie.id,
+            movieId,
             title: movie.title || movie.name,
             overview: movie.overview,
             posterPath: movie.posterPath,
             releaseDate: movie.releaseDate || movie.firstAirDate,
             voteAverage: movie.voteAverage,
             mediaType: movie.mediaType,
-            category: "General"  // Add this with a default or fetch from movie if available
-          }
-        }
+            category: 'next-up', // Set default category as 'next-up' for new Next Up movies
+          },
+        },
       });
       setSavedNextUpMovieIds((prev) => {
         const updated = [...prev, movieId];
         saveNextUpMovieIds(updated);
         return updated;
       });
-      console.log("Successfully added to Next Up from Trending:", movieId);
+      console.log(`Successfully added to Next Up from Trending: ${movieId}`);
     } catch (error) {
       console.error('Error saving movie to Next Up from Trending:', error);
     }
@@ -116,9 +117,10 @@ function Trending() {
 
   const saveToSeenIt = async (movie: Movie | TVShow) => {
     const movieId = movie.id.toString();
-    console.log("Attempting to mark as Seen from Trending:", movieId, movie.title || movie.name);
+
+    // Check if the movie is already marked as seen
     if (savedSeenItMovieIds.includes(movieId)) {
-      console.log("Movie already marked as Seen from Trending:", movieId);
+      console.log(`Movie already marked as Seen: ${movieId}`);
       return;
     }
 
@@ -127,23 +129,23 @@ function Trending() {
         mutation: SAVE_SEEN_IT_TRENDING,
         variables: {
           input: {
-            movieId: movie.id,
+            movieId,
             title: movie.title || movie.name,
             overview: movie.overview,
             posterPath: movie.posterPath,
             releaseDate: movie.releaseDate || movie.firstAirDate,
             voteAverage: movie.voteAverage,
             mediaType: movie.mediaType,
-            category: "General"  // Add this with a default or fetch from movie if available
-          }
-        }
+            category: 'seen-it', // Set default category as 'seen-it' for seen movies
+          },
+        },
       });
       setSavedSeenItMovieIds((prev) => {
         const updated = [...prev, movieId];
         saveSeenItMovieIds(updated);
         return updated;
       });
-      console.log("Successfully marked as Seen from Trending:", movieId);
+      console.log(`Successfully marked as Seen from Trending: ${movieId}`);
     } catch (error) {
       console.error('Error saving movie to Seen It from Trending:', error);
     }
@@ -220,6 +222,7 @@ function Trending() {
         ))}
       </div>
 
+      {/* Trending TV Shows Section */}
       <h1 className="mt-5 mb-4">Trending TV Shows (Today)</h1>
       <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-4">
         {showsData.trendingTVShows.map((show: TVShow) => (
