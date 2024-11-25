@@ -1,6 +1,8 @@
-import User from '../models/User.js';
-import { AuthenticationError, signToken } from '../services/auth.js';
-import Movie from '../models/Movie.js';
+// Updated resolvers.ts with fixes for Node16 moduleResolution
+import User from '../models/User.js';  // Added '.js' for Node16 module resolution
+import { AuthenticationError, signToken } from '../services/auth.js';  // Added '.js'
+import Movie from '../models/Movie.js';  // Added '.js'
+import { Types } from 'mongoose';
 
 // Define the context type for your resolvers
 interface ResolverContext {
@@ -21,7 +23,7 @@ const resolvers = {
     me: async (_: unknown, { filter }: { filter?: { type: string } }, context: ResolverContext) => {
       if (!context.user) throw new AuthenticationError('You must be logged in');
 
-      const filters = filter ? { /* Add filtering logic */ } : {};
+      const filters = filter ? { /* Add filtering logic if needed */ } : {};
       return await User.findOne({ _id: context.user._id })
         .populate({ path: 'nextUpMovies', match: filters })
         .populate({ path: 'seenItMovies', match: filters });
@@ -96,7 +98,7 @@ const resolvers = {
       return { token, user };
     },
 
-    login: async (_: any, { email, password }: any) => {
+    login: async (_: unknown, { email, password }: any) => {
       const user = await User.findOne({ $or: [{ username: email }, { email }] });
 
       if (!user) {
@@ -112,16 +114,15 @@ const resolvers = {
       return { token, user };
     },
 
-    removeMovie: async (_: any, { movieId }: { movieId: string }, context: ResolverContext) => {
+    async removeMovie(_: unknown, { movieId }: { movieId: string }, context: ResolverContext) {
       if (!context.user) throw new AuthenticationError('You must be logged in!');
 
-      // Remove from both nextUpMovies and seenItMovies
       const updatedUser = await User.findOneAndUpdate(
         { _id: context.user._id },
         { 
           $pull: { 
-            nextUpMovies: { _id: movieId }, 
-            seenItMovies: { _id: movieId } 
+            nextUpMovies: new Types.ObjectId(movieId), 
+            seenItMovies: new Types.ObjectId(movieId) 
           } 
         },
         { new: true }
@@ -131,20 +132,11 @@ const resolvers = {
         throw new Error("Couldn't remove movie");
       }
 
-      // Ensure every movie has a title or a default one
-      const populateMovieWithTitle = (movie: any) => ({
-        ...movie.toObject(),
-        title: movie.title || 'Untitled'
-      });
-
-      updatedUser.nextUpMovies = (updatedUser.nextUpMovies || []).map(populateMovieWithTitle);
-      updatedUser.seenItMovies = (updatedUser.seenItMovies || []).map(populateMovieWithTitle);
-
       // Remove the movie from the database if it's no longer referenced by any user
       const movieInUse = await User.findOne({ 
         $or: [
-          { nextUpMovies: movieId },
-          { seenItMovies: movieId }
+          { nextUpMovies: { $in: [new Types.ObjectId(movieId)] } },
+          { seenItMovies: { $in: [new Types.ObjectId(movieId)] } }
         ]
       });
       
@@ -155,7 +147,7 @@ const resolvers = {
       return updatedUser;
     },
 
-    rateMovie: async (_: any, { movieId, rating }: { movieId: string; rating: number }, context: ResolverContext) => {
+    rateMovie: async (_: unknown, { movieId, rating }: { movieId: string; rating: number }, context: ResolverContext) => {
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
@@ -188,21 +180,21 @@ const resolvers = {
       voteAverage: number 
     } }, context: ResolverContext) {
       if (!context.user) throw new AuthenticationError('You must be logged in.');
-    
+
       let movie = await Movie.findOne({ movieId: input.movieId });
       if (!movie) {
         movie = await Movie.create(input);
       }
-    
+
       const user = await User.findByIdAndUpdate(
         context.user._id,
         { $addToSet: { nextUpMovies: movie._id } },
         { new: true }
       ).populate('nextUpMovies');
-    
+
       return user;
     },
-    
+
     async saveSeenItMovie(_: unknown, { input }: { input: { 
       movieId: string; 
       title: string; 
@@ -212,22 +204,21 @@ const resolvers = {
       voteAverage: number 
     } }, context: ResolverContext) {
       if (!context.user) throw new AuthenticationError('You must be logged in.');
-    
+
       let movie = await Movie.findOne({ movieId: input.movieId });
       if (!movie) {
         movie = await Movie.create(input);
       }
-    
+
       const user = await User.findByIdAndUpdate(
         context.user._id,
         { $addToSet: { seenItMovies: movie._id } },
         { new: true }
       ).populate('seenItMovies');
-    
+
       return user;
     },
 
-    // New mutations for handling trending items
     async saveNextUpTrending(
       _: unknown, 
       { input }: { input: { 
@@ -242,21 +233,21 @@ const resolvers = {
       context: ResolverContext
     ) {
       if (!context.user) throw new AuthenticationError('You must be logged in.');
-    
+
       let movie = await Movie.findOne({ movieId: input.movieId });
       if (!movie) {
         movie = await Movie.create(input);
       }
-    
+
       const user = await User.findByIdAndUpdate(
         context.user._id,
         { $addToSet: { nextUpMovies: movie._id } },
         { new: true }
       ).populate('nextUpMovies');
-    
+
       return user;
     },
-    
+
     async saveSeenItTrending(
       _: unknown, 
       { input }: { input: { 
@@ -271,18 +262,18 @@ const resolvers = {
       context: ResolverContext
     ) {
       if (!context.user) throw new AuthenticationError('You must be logged in.');
-    
+
       let movie = await Movie.findOne({ movieId: input.movieId });
       if (!movie) {
         movie = await Movie.create(input);
       }
-    
+
       const user = await User.findByIdAndUpdate(
         context.user._id,
         { $addToSet: { seenItMovies: movie._id } },
         { new: true }
       ).populate('seenItMovies');
-    
+
       return user;
     }    
   },

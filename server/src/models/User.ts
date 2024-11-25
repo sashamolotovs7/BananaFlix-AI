@@ -1,14 +1,18 @@
-import { Schema, Types, model, type Document } from 'mongoose';
+// server/src/models/User.ts
+import { Schema, model, type Document } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { Types } from 'mongoose'; // You still need this for Types.ObjectId
+
+export type MovieRef = { type: Types.ObjectId; ref: 'Movie' };
 
 export interface UserDocument extends Document {
   id: string;
   username: string;
   email: string;
   password: string;
-  isCorrectPassword(password: string): Promise<boolean>;
-  nextUpMovies: [{ type: Types.ObjectId, ref: 'Movie' }];
-  seenItMovies: [{ type: Types.ObjectId, ref: 'Movie' }];
+  isCorrectPassword: (password: string) => Promise<boolean>;
+  nextUpMovies: MovieRef[];
+  seenItMovies: MovieRef[];
 }
 
 const userSchema = new Schema<UserDocument>(
