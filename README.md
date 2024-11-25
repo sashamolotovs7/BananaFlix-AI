@@ -63,6 +63,7 @@ The platform integrates TMDB's extensive movie database with modern, user-friend
     - "Seen it": Keep track of and review movies you've seen.
 - Trending Movies: 
     - Explore the latest popular films with detailed information pulled from TMDB.
+    - Integrated the current streaming services available for movies and tv shows
 - Interactive Ratings and Reviews: 
     - Rate movies on a 10-point scale and write reviews to share your thoughts.
 - BananaBot Chat Assistant: 
