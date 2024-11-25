@@ -3,13 +3,16 @@ import { gql, useQuery } from '@apollo/client';
 import { useState } from 'react';
 import { Movie } from '../models/Movie';
 import { TVShow } from '../models/TvShow';
-import { 
-  saveNextUpMovieIds, 
-  getNextUpMovieIds, 
-  saveSeenItMovieIds, 
-  getSeenItMovieIds 
+import {
+  saveNextUpMovieIds,
+  getNextUpMovieIds,
+  saveSeenItMovieIds,
+  getSeenItMovieIds
 } from '../utils/localStorage';
 import Auth from '../utils/auth';
+
+const API_KEY = import.meta.env.VITE_REACT_APP_TMDB_API_KEY;
+
 
 const TRENDING_MOVIES = gql`
   query GetTrendingMovies {
@@ -45,7 +48,10 @@ function Trending() {
   const { loading: moviesLoading, error: moviesError, data: moviesData } = useQuery(TRENDING_MOVIES);
   const { loading: showsLoading, error: showsError, data: showsData } = useQuery(TRENDING_TV_SHOWS);
 
-  const [expanded, setExpanded] = useState<number | null>(null); // Track expanded movie/show
+  const [expanded, setExpanded] = useState<number | null>(null); 
+  const [movieProviders, setMovieProviders] = useState<{ [key: number]: any }>({}); // To store providers for movies
+  const [tvShowProviders, setTvShowProviders] = useState<{ [key: number]: any }>({});; // To store providers for shows
+
 
   // LocalStorage state for Next Up and Seen It
   const [savedNextUpMovieIds, setSavedNextUpMovieIds] = useState<string[]>(getNextUpMovieIds());
@@ -85,6 +91,50 @@ function Trending() {
 
   const truncateText = (text: string, length: number) => {
     return text.length > length ? text.substring(0, length) + '...' : text;
+  };
+
+  // Function to fetch watch providers (without GraphQL)
+  const fetchWatchProviders = async (id: number) => {
+    try {
+      const response = await fetch(
+        `https://api.themoviedb.org/3/movie/${id}/watch/providers?api_key=${API_KEY}`
+      );
+      const data = await response.json();
+      const providers = data.results?.US; // Adjust the region if needed
+      if (providers) {
+        setMovieProviders((prev) => ({ ...prev, [id]: providers }));
+      }
+    } catch (error) {
+      console.error(`Error fetching providers for movie ID ${id}:`, error);
+    }
+  };
+
+  // Fetch watch providers for TV shows
+  const fetchWatchProvidersForTVShows = async (id: number) => {
+    try {
+      const response = await fetch(
+        `https://api.themoviedb.org/3/tv/${id}/watch/providers?api_key=${API_KEY}`
+      );
+      const data = await response.json();
+      const providers = data.results?.US; // Get providers for the US region (can be adjusted)
+      if (providers) {
+        setTvShowProviders((prev) => ({ ...prev, [id]: providers }));
+      }
+    } catch (error) {
+      console.error(`Error fetching providers for TV show ID ${id}:`, error);
+    }
+  };
+
+  // Toggle the view of the watch providers section
+  const toggleProviders = (id: number, mediaType: 'movie' | 'tv') => {
+    // Toggle the expanded state for the providers section
+    setExpanded(expanded === id ? null : id);
+
+    if (mediaType === 'movie' && !movieProviders[id]) {
+      fetchWatchProviders(id); // Fetch movie providers
+    } else if (mediaType === 'tv' && !tvShowProviders[id]) {
+      fetchWatchProvidersForTVShows(id); // Fetch TV show providers
+    }
   };
 
   return (
@@ -148,6 +198,31 @@ function Trending() {
                       ? 'Seen It'
                       : 'Mark as Seen'}
                   </button>
+
+                  {/* Toggle Watch Providers Button */}
+                  <button
+                    className="watch-btn"
+                    onClick={() => toggleProviders(movie.id, 'movie')} // Trigger the providers toggle and fetch
+                  >
+                    Watch Here
+                  </button>
+                  {expanded === movie.id && (
+                    <div className="provider-logos">
+                      {movieProviders[movie.id]?.flatrate?.length > 0 ? (
+                        movieProviders[movie.id].flatrate.slice(0, 4).map((provider: any) => (
+                          <img
+                            key={provider.provider_id}
+                            src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
+                            alt={provider.provider_name}
+                            className="provider-logo"
+                          />
+                        ))
+                      ) : (
+                        <p className="no-providers">No streaming services available</p>
+                      )}
+                    </div>
+                  )}
+
                 </div>
               </div>
             </div>
@@ -191,6 +266,29 @@ function Trending() {
                     Rating: {show.voteAverage.toFixed(1)}/10
                   </small>
                 </p>
+                {/* Toggle Watch Providers Button */}
+                <button
+                    className="watch-btn"
+                    onClick={() => toggleProviders(show.id, 'tv')} // Trigger the providers toggle for TV shows
+                  >
+                    Watch Here
+                  </button>
+                  {expanded === show.id && (
+                    <div className="provider-logos">
+                      {tvShowProviders[show.id]?.flatrate?.length > 0 ? (
+                        tvShowProviders[show.id].flatrate.slice(0, 4).map((provider: any) => (
+                          <img
+                            key={provider.provider_id}
+                            src={`https://image.tmdb.org/t/p/w92${provider.logo_path}`}
+                            alt={provider.provider_name}
+                            className="provider-logo"
+                          />
+                        ))
+                      ) : (
+                        <p className="no-providers">No streaming services available</p>
+                      )}
+                    </div>
+                  )}
               </div>
             </div>
           </div>
