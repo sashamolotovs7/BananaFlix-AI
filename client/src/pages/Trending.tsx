@@ -1,6 +1,6 @@
 import './Trending.css';
-import { gql, useQuery, useMutation } from '@apollo/client';
-import { useState, useEffect } from 'react';
+import { gql, useQuery } from '@apollo/client';
+import { useState } from 'react';
 import { Movie } from '../models/Movie';
 import { TVShow } from '../models/TvShow';
 import { 
@@ -8,7 +8,8 @@ import {
   getNextUpMovieIds, 
   saveSeenItMovieIds, 
   getSeenItMovieIds 
-} from '../utils/localStorage'; // Assuming you have these utility functions
+} from '../utils/localStorage';
+import Auth from '../utils/auth';
 
 const TRENDING_MOVIES = gql`
   query GetTrendingMovies {
@@ -130,7 +131,7 @@ function Trending() {
                   <button
                     className="btn btn-outline-primary btn-sm"
                     onClick={() => handleAddToNextUp(movie)}
-                    disabled={savedNextUpMovieIds.includes(movie.id.toString())}
+                    disabled={savedNextUpMovieIds.includes(movie.id.toString()) || !Auth.loggedIn()}
                   >
                     {savedNextUpMovieIds.includes(movie.id.toString())
                       ? 'Added to Next Up'
@@ -141,7 +142,7 @@ function Trending() {
                   <button
                     className="btn btn-outline-secondary btn-sm"
                     onClick={() => handleSaveSeenIt(movie)}
-                    disabled={savedSeenItMovieIds.includes(movie.id.toString())}
+                    disabled={savedSeenItMovieIds.includes(movie.id.toString()) || !Auth.loggedIn()}
                   >
                     {savedSeenItMovieIds.includes(movie.id.toString())
                       ? 'Seen It'
@@ -190,30 +191,6 @@ function Trending() {
                     Rating: {show.voteAverage.toFixed(1)}/10
                   </small>
                 </p>
-
-                <div className="d-flex flex-wrap justify-content-center align-items-center gap-1 mt-1">
-                  {/* "Next Up" Button */}
-                  <button
-                    className="btn btn-outline-primary btn-sm"
-                    onClick={() => handleAddToNextUp(show)}
-                    disabled={savedNextUpMovieIds.includes(show.id.toString())}
-                  >
-                    {savedNextUpMovieIds.includes(show.id.toString())
-                      ? 'Added to Next Up'
-                      : 'Add to Next Up'}
-                  </button>
-
-                  {/* "Seen It" Button */}
-                  <button
-                    className="btn btn-outline-secondary btn-sm"
-                    onClick={() => handleSaveSeenIt(show)}
-                    disabled={savedSeenItMovieIds.includes(show.id.toString())}
-                  >
-                    {savedSeenItMovieIds.includes(show.id.toString())
-                      ? 'Seen It'
-                      : 'Mark as Seen'}
-                  </button>
-                </div>
               </div>
             </div>
           </div>
