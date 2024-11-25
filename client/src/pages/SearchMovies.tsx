@@ -11,7 +11,6 @@ import { searchMovies } from '../utils/API';
 import { SAVE_NEXT_UP_MOVIE, SAVE_SEEN_IT_MOVIE } from '../utils/mutations';
 import './SearchMovies.css';
 
-
 const API_KEY = import.meta.env.VITE_REACT_APP_TMDB_API_KEY;
 
 const SearchMovies = () => {
@@ -29,12 +28,14 @@ const SearchMovies = () => {
   const [saveSeenItMovie] = useMutation(SAVE_SEEN_IT_MOVIE);
 
   useEffect(() => {
+    console.log("Effect triggered, updating local storage:", { savedNextUpMovieIds, savedSeenItMovieIds });
     saveNextUpMovieIds(savedNextUpMovieIds);
     saveSeenItMovieIds(savedSeenItMovieIds);
   }, [savedNextUpMovieIds, savedSeenItMovieIds]);
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    console.log("Form submitted with input:", searchInput);
     if (!searchInput) return;
 
     try {
@@ -51,17 +52,23 @@ const SearchMovies = () => {
           : '',
         releaseDate: movie.release_date,
         voteAverage: movie.vote_average,
+        mediaType: 'movie',
+        // Remove category here if not needed or if it's not part of your schema
       }));
 
       setSearchedMovies(movieData);
       setSearchInput('');
     } catch (error) {
-      console.error(error);
+      console.error("Error in handleFormSubmit:", error);
     }
   };
 
   const handleAddToNextUp = async (movie: Movie) => {
-    if (savedNextUpMovieIds.includes(movie.id.toString())) return;
+    console.log("Attempting to add to Next Up:", movie.id, movie.title);
+    if (savedNextUpMovieIds.includes(movie.id.toString())) {
+      console.log("Movie already in Next Up:", movie.id);
+      return;
+    }
   
     const details = {
       movieId: movie.id.toString(),
@@ -70,18 +77,25 @@ const SearchMovies = () => {
       posterPath: movie.posterPath,
       releaseDate: movie.releaseDate,
       voteAverage: movie.voteAverage,
+      mediaType: movie.mediaType || 'movie',
+      category: "General"  // Add this with a default or fetch from movie if available
     };
   
     try {
       await saveNextUpMovie({ variables: { input: details } });
       setSavedNextUpMovieIds([...savedNextUpMovieIds, movie.id.toString()]);
+      console.log("Successfully added movie to Next Up:", movie.id);
     } catch (error) {
       console.error('Error saving movie to Next Up:', error);
     }
   };
   
   const handleSaveSeenIt = async (movie: Movie) => {
-    if (savedSeenItMovieIds.includes(movie.id.toString())) return;
+    console.log("Attempting to mark as Seen:", movie.id, movie.title);
+    if (savedSeenItMovieIds.includes(movie.id.toString())) {
+      console.log("Movie already marked as Seen:", movie.id);
+      return;
+    }
   
     const details = {
       movieId: movie.id.toString(),
@@ -90,11 +104,14 @@ const SearchMovies = () => {
       posterPath: movie.posterPath,
       releaseDate: movie.releaseDate,
       voteAverage: movie.voteAverage,
+      mediaType: movie.mediaType || 'movie',
+      category: "General"  // Add this with a default or fetch from movie if available
     };
   
     try {
       await saveSeenItMovie({ variables: { input: details } });
       setSavedSeenItMovieIds([...savedSeenItMovieIds, movie.id.toString()]);
+      console.log("Successfully marked movie as Seen:", movie.id);
     } catch (error) {
       console.error('Error saving movie to Seen It:', error);
     }
@@ -206,4 +223,3 @@ const SearchMovies = () => {
 };
 
 export default SearchMovies;
-

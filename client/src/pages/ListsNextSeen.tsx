@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useQuery } from '@apollo/client';
-import { GET_USER_MOVIE_LISTS } from '../utils/mutations';
+import { useQuery, useMutation } from '@apollo/client';
+import { GET_USER_MOVIE_LISTS, REMOVE_MOVIE } from '../utils/mutations';
 import './ListsNextSeen.css';
 
 const ListsNextSeen: React.FC = () => {
-  const { loading, error, data } = useQuery(GET_USER_MOVIE_LISTS);
+  const { loading, error, data, refetch } = useQuery(GET_USER_MOVIE_LISTS);
+  const [removeMovie] = useMutation(REMOVE_MOVIE);
 
   // State for current and applied selections
   const [nextUpSelections, setNextUpSelections] = useState<string[]>([]);
@@ -46,6 +47,34 @@ const ListsNextSeen: React.FC = () => {
     console.log(`Applied selections:`, selections);
   };
 
+  const handleDeleteSelected = async (listType: 'nextUp' | 'seenIt') => {
+    const selections = listType === 'nextUp' ? nextUpSelections : seenItSelections;
+
+    try {
+      for (const movieId of selections) {
+        const { data } = await removeMovie({ variables: { movieId } });
+        // Here you might want to check if the movie was actually removed from the list
+        if (!data?.removeMovie) {
+          throw new Error(`Failed to remove movie with id ${movieId}`);
+        }
+      }
+      // Clear the local selections after deletion
+      if (listType === 'nextUp') {
+        setNextUpSelections([]);
+        setAppliedNextUpSelections([]);
+      } else {
+        setSeenItSelections([]);
+        setAppliedSeenItSelections([]);
+      }
+      console.log(`Movies successfully removed from ${listType} list.`);
+      // Refetch data to update the list
+      await refetch();
+    } catch (error) {
+      console.error(`Error deleting movies from ${listType}:`, error);
+      alert(`Failed to delete movies from ${listType} list. Please try again.`);
+    }
+  };
+
   return (
     <div className="lists-next-seen">
       {/* Next Up Movies Section */}
@@ -68,7 +97,7 @@ const ListsNextSeen: React.FC = () => {
                     checked={nextUpSelections.includes(movie._id)}
                     onChange={() => handleCheckboxChange(movie._id, setNextUpSelections)}
                   />
-                  {movie.title}
+                  {movie.title || 'Untitled'}
                 </label>
               </div>
             ))}
@@ -79,6 +108,12 @@ const ListsNextSeen: React.FC = () => {
               }
             >
               Apply
+            </button>
+            <button
+              className="delete-button"
+              onClick={() => handleDeleteSelected('nextUp')}
+            >
+              Delete
             </button>
           </div>
         )}
@@ -91,8 +126,8 @@ const ListsNextSeen: React.FC = () => {
             )
             .map((movie: any) => (
               <div key={movie._id} className="movie-card">
-                <img src={movie.posterPath || ''} alt={movie.title} />
-                <h3>{movie.title}</h3>
+                <img src={movie.posterPath || ''} alt={movie.title || 'Untitled'} />
+                <h3>{movie.title || 'Untitled'}</h3>
                 <p>{movie.overview}</p>
               </div>
             ))}
@@ -119,7 +154,7 @@ const ListsNextSeen: React.FC = () => {
                     checked={seenItSelections.includes(movie._id)}
                     onChange={() => handleCheckboxChange(movie._id, setSeenItSelections)}
                   />
-                  {movie.title}
+                  {movie.title || 'Untitled'}
                 </label>
               </div>
             ))}
@@ -130,6 +165,12 @@ const ListsNextSeen: React.FC = () => {
               }
             >
               Apply
+            </button>
+            <button
+              className="delete-button"
+              onClick={() => handleDeleteSelected('seenIt')}
+            >
+              Delete
             </button>
           </div>
         )}
@@ -142,8 +183,8 @@ const ListsNextSeen: React.FC = () => {
             )
             .map((movie: any) => (
               <div key={movie._id} className="movie-card">
-                <img src={movie.posterPath || ''} alt={movie.title} />
-                <h3>{movie.title}</h3>
+                <img src={movie.posterPath || ''} alt={movie.title || 'Untitled'} />
+                <h3>{movie.title || 'Untitled'}</h3>
                 <p>{movie.overview}</p>
               </div>
             ))}

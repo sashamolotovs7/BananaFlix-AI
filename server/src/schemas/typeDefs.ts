@@ -4,14 +4,16 @@ const typeDefs = gql`
   type Movie {
     _id: ID!
     movieId: String!
-    title: String!
+    title: String
     overview: String!
     posterPath: String
     releaseDate: String
     voteAverage: Float
+    mediaType: String
+    category: String # Add this if you want to store category in the database
   }
 
-    type APIMovie {
+  type APIMovie {
     adult: Boolean!
     backdropPath: String
     genreIds: [Int!]!
@@ -26,7 +28,7 @@ const typeDefs = gql`
     video: Boolean!
     voteAverage: Float
     voteCount: Int
-    mediaType: String! # Added mediaType
+    mediaType: String!
   }
 
   type APITVShow {
@@ -43,7 +45,7 @@ const typeDefs = gql`
     name: String!
     voteAverage: Float
     voteCount: Int
-    mediaType: String! # Added mediaType
+    mediaType: String!
     first_air_date: String
   }
 
@@ -84,11 +86,13 @@ const typeDefs = gql`
 
   input MovieInput {
     movieId: String!
-    title: String
-    overview: String
+    title: String!
+    overview: String!
     posterPath: String
     releaseDate: String
     voteAverage: Float
+    mediaType: String!
+    category: String! # Add this to match what's being sent from the client
   }
 
   input UserInput {
@@ -104,6 +108,8 @@ const typeDefs = gql`
     saveSeenItMovie(input: MovieInput!): User
     removeMovie(movieId: String!): User
     rateMovie(movieId: String!, rating: Float!): User
+    saveNextUpTrending(input: MovieInput!): User
+    saveSeenItTrending(input: MovieInput!): User
   }
 `;
 

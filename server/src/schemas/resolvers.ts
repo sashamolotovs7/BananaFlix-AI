@@ -2,16 +2,15 @@ import User from '../models/User.js';
 import { AuthenticationError, signToken } from '../services/auth.js';
 import Movie from '../models/Movie.js';
 
-interface User {
-  _id: string;
-  username: string;
-  email: string;
-  password: string;
-  movieCount: number;
-}
-
-interface Context {
-  user?: User;
+// Define the context type for your resolvers
+interface ResolverContext {
+  user?: {
+    _id: string;
+    username: string;
+    email: string;
+    password: string;
+    movieCount: number;
+  };
 }
 
 const TMDB_API_KEY = process.env.REACT_APP_TMDB_API_KEY;
@@ -19,7 +18,7 @@ const BASE_URL = 'https://api.themoviedb.org/3';
 
 const resolvers = {
   Query: {
-    me: async (_: unknown, { filter }: { filter?: { type: string } }, context: Context) => {
+    me: async (_: unknown, { filter }: { filter?: { type: string } }, context: ResolverContext) => {
       if (!context.user) throw new AuthenticationError('You must be logged in');
 
       const filters = filter ? { /* Add filtering logic */ } : {};
@@ -59,7 +58,7 @@ const resolvers = {
 
     trendingTVShows: async () => {
       const response = await fetch(
-        `${BASE_URL}/trending/tv/day?language=en-US'`,
+        `${BASE_URL}/trending/tv/day?language=en-US`,
         {
           headers: {
             Authorization: `Bearer ${TMDB_API_KEY}`,
@@ -113,24 +112,50 @@ const resolvers = {
       return { token, user };
     },
 
-    removeMovie: async (_: any, { movieId }: { movieId: string }, context: Context) => {
-      if (context.user) {
-        const updatedUser = await User.findOneAndUpdate(
-          { _id: context.user._id },
-          { $pull: { savedMovies: { movieId } } },
-          { new: true }
-        );
+    removeMovie: async (_: any, { movieId }: { movieId: string }, context: ResolverContext) => {
+      if (!context.user) throw new AuthenticationError('You must be logged in!');
 
-        if (!updatedUser) {
-          throw new AuthenticationError("Couldn't find user with this id!");
-        }
+      // Remove from both nextUpMovies and seenItMovies
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: context.user._id },
+        { 
+          $pull: { 
+            nextUpMovies: { _id: movieId }, 
+            seenItMovies: { _id: movieId } 
+          } 
+        },
+        { new: true }
+      ).populate('nextUpMovies seenItMovies');
 
-        return updatedUser;
+      if (!updatedUser) {
+        throw new Error("Couldn't remove movie");
       }
-      throw new AuthenticationError('You need to be logged in!');
+
+      // Ensure every movie has a title or a default one
+      const populateMovieWithTitle = (movie: any) => ({
+        ...movie.toObject(),
+        title: movie.title || 'Untitled'
+      });
+
+      updatedUser.nextUpMovies = (updatedUser.nextUpMovies || []).map(populateMovieWithTitle);
+      updatedUser.seenItMovies = (updatedUser.seenItMovies || []).map(populateMovieWithTitle);
+
+      // Remove the movie from the database if it's no longer referenced by any user
+      const movieInUse = await User.findOne({ 
+        $or: [
+          { nextUpMovies: movieId },
+          { seenItMovies: movieId }
+        ]
+      });
+      
+      if (!movieInUse) {
+        await Movie.findByIdAndDelete(movieId);
+      }
+
+      return updatedUser;
     },
 
-    rateMovie: async (_: any, { movieId, rating }: { movieId: string; rating: number }, context: Context) => {
+    rateMovie: async (_: any, { movieId, rating }: { movieId: string; rating: number }, context: ResolverContext) => {
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },
@@ -154,14 +179,19 @@ const resolvers = {
       throw new AuthenticationError('You need to be logged in!');
     },
 
-    async saveNextUpMovie(_: unknown, { input }: any, context: Context) {
+    async saveNextUpMovie(_: unknown, { input }: { input: { 
+      movieId: string; 
+      title: string; 
+      overview: string; 
+      posterPath: string; 
+      releaseDate: string; 
+      voteAverage: number 
+    } }, context: ResolverContext) {
       if (!context.user) throw new AuthenticationError('You must be logged in.');
     
-      const { movieId, title, overview, posterPath, releaseDate, voteAverage } = input;
-    
-      let movie = await Movie.findOne({ movieId });
+      let movie = await Movie.findOne({ movieId: input.movieId });
       if (!movie) {
-        movie = await Movie.create({ movieId, title, overview, posterPath, releaseDate, voteAverage });
+        movie = await Movie.create(input);
       }
     
       const user = await User.findByIdAndUpdate(
@@ -173,14 +203,78 @@ const resolvers = {
       return user;
     },
     
-    async saveSeenItMovie(_: unknown, { input }: any, context: Context) {
+    async saveSeenItMovie(_: unknown, { input }: { input: { 
+      movieId: string; 
+      title: string; 
+      overview: string; 
+      posterPath: string; 
+      releaseDate: string; 
+      voteAverage: number 
+    } }, context: ResolverContext) {
       if (!context.user) throw new AuthenticationError('You must be logged in.');
     
-      const { movieId, title, overview, posterPath, releaseDate, voteAverage } = input;
-    
-      let movie = await Movie.findOne({ movieId });
+      let movie = await Movie.findOne({ movieId: input.movieId });
       if (!movie) {
-        movie = await Movie.create({ movieId, title, overview, posterPath, releaseDate, voteAverage });
+        movie = await Movie.create(input);
+      }
+    
+      const user = await User.findByIdAndUpdate(
+        context.user._id,
+        { $addToSet: { seenItMovies: movie._id } },
+        { new: true }
+      ).populate('seenItMovies');
+    
+      return user;
+    },
+
+    // New mutations for handling trending items
+    async saveNextUpTrending(
+      _: unknown, 
+      { input }: { input: { 
+        movieId: string; 
+        title: string; 
+        overview: string; 
+        posterPath: string; 
+        releaseDate: string; 
+        voteAverage: number; 
+        mediaType: string 
+      } }, 
+      context: ResolverContext
+    ) {
+      if (!context.user) throw new AuthenticationError('You must be logged in.');
+    
+      let movie = await Movie.findOne({ movieId: input.movieId });
+      if (!movie) {
+        movie = await Movie.create(input);
+      }
+    
+      const user = await User.findByIdAndUpdate(
+        context.user._id,
+        { $addToSet: { nextUpMovies: movie._id } },
+        { new: true }
+      ).populate('nextUpMovies');
+    
+      return user;
+    },
+    
+    async saveSeenItTrending(
+      _: unknown, 
+      { input }: { input: { 
+        movieId: string; 
+        title: string; 
+        overview: string; 
+        posterPath: string; 
+        releaseDate: string; 
+        voteAverage: number; 
+        mediaType: string 
+      } }, 
+      context: ResolverContext
+    ) {
+      if (!context.user) throw new AuthenticationError('You must be logged in.');
+    
+      let movie = await Movie.findOne({ movieId: input.movieId });
+      if (!movie) {
+        movie = await Movie.create(input);
       }
     
       const user = await User.findByIdAndUpdate(

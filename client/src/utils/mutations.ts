@@ -66,6 +66,7 @@ export const SAVE_SEEN_IT_MOVIE = gql`
     }
   }
 `;
+
 export const GET_USER_MOVIE_LISTS = gql`
   query getUserMovieLists {
     me {
@@ -84,6 +85,23 @@ export const GET_USER_MOVIE_LISTS = gql`
         posterPath
         releaseDate
         voteAverage
+      }
+    }
+  }
+`;
+
+export const REMOVE_MOVIE = gql`
+  mutation RemoveMovie($movieId: String!) {
+    removeMovie(movieId: $movieId) {
+      _id
+      username
+      nextUpMovies {
+        _id
+        title
+      }
+      seenItMovies {
+        _id
+        title
       }
     }
   }

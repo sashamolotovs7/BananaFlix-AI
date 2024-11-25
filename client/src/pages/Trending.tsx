@@ -1,5 +1,5 @@
 import './Trending.css';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useQuery, useApolloClient } from '@apollo/client';
 import { useState } from 'react';
 import { Movie } from '../models/Movie';
 import { TVShow } from '../models/TvShow';
@@ -40,11 +40,38 @@ const TRENDING_TV_SHOWS = gql`
   }
 `;
 
+const SAVE_NEXT_UP_TRENDING = gql`
+  mutation SaveNextUpTrending($input: MovieInput!) {
+    saveNextUpTrending(input: $input) {
+      _id
+      username
+      nextUpMovies {
+        _id
+        title
+      }
+    }
+  }
+`;
+
+const SAVE_SEEN_IT_TRENDING = gql`
+  mutation SaveSeenItTrending($input: MovieInput!) {
+    saveSeenItTrending(input: $input) {
+      _id
+      username
+      seenItMovies {
+        _id
+        title
+      }
+    }
+  }
+`;
+
 function Trending() {
   const { loading: moviesLoading, error: moviesError, data: moviesData } = useQuery(TRENDING_MOVIES);
   const { loading: showsLoading, error: showsError, data: showsData } = useQuery(TRENDING_TV_SHOWS);
+  const [client] = useState(useApolloClient());
 
-  const [expanded, setExpanded] = useState<number | null>(null); // Expanded movie/show description
+  const [expanded, setExpanded] = useState<number | null>(null); 
   const [savedNextUpMovieIds, setSavedNextUpMovieIds] = useState<string[]>(getNextUpMovieIds());
   const [savedSeenItMovieIds, setSavedSeenItMovieIds] = useState<string[]>(getSeenItMovieIds());
 
@@ -54,45 +81,71 @@ function Trending() {
 
   const saveToNextUp = async (movie: Movie | TVShow) => {
     const movieId = movie.id.toString();
-    if (savedNextUpMovieIds.includes(movieId)) return;
+    console.log("Attempting to add to Next Up from Trending:", movieId, movie.title || movie.name);
+    if (savedNextUpMovieIds.includes(movieId)) {
+      console.log("Movie already in Next Up from Trending:", movieId);
+      return;
+    }
 
     try {
-      const response = await fetch('/api/movies/next-up', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(movie),
+      await client.mutate({
+        mutation: SAVE_NEXT_UP_TRENDING,
+        variables: {
+          input: {
+            movieId: movie.id,
+            title: movie.title || movie.name,
+            overview: movie.overview,
+            posterPath: movie.posterPath,
+            releaseDate: movie.releaseDate || movie.firstAirDate,
+            voteAverage: movie.voteAverage,
+            mediaType: movie.mediaType,
+            category: "General"  // Add this with a default or fetch from movie if available
+          }
+        }
       });
-      if (!response.ok) throw new Error('Failed to save movie to Next Up');
       setSavedNextUpMovieIds((prev) => {
         const updated = [...prev, movieId];
-        saveNextUpMovieIds(updated); // Save to local storage
+        saveNextUpMovieIds(updated);
         return updated;
       });
-      console.log('Movie saved to Next Up:', await response.json());
+      console.log("Successfully added to Next Up from Trending:", movieId);
     } catch (error) {
-      console.error('Error saving movie to Next Up:', error);
+      console.error('Error saving movie to Next Up from Trending:', error);
     }
   };
 
   const saveToSeenIt = async (movie: Movie | TVShow) => {
     const movieId = movie.id.toString();
-    if (savedSeenItMovieIds.includes(movieId)) return;
+    console.log("Attempting to mark as Seen from Trending:", movieId, movie.title || movie.name);
+    if (savedSeenItMovieIds.includes(movieId)) {
+      console.log("Movie already marked as Seen from Trending:", movieId);
+      return;
+    }
 
     try {
-      const response = await fetch('/api/movies/seen-it', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(movie),
+      await client.mutate({
+        mutation: SAVE_SEEN_IT_TRENDING,
+        variables: {
+          input: {
+            movieId: movie.id,
+            title: movie.title || movie.name,
+            overview: movie.overview,
+            posterPath: movie.posterPath,
+            releaseDate: movie.releaseDate || movie.firstAirDate,
+            voteAverage: movie.voteAverage,
+            mediaType: movie.mediaType,
+            category: "General"  // Add this with a default or fetch from movie if available
+          }
+        }
       });
-      if (!response.ok) throw new Error('Failed to save movie to Seen It');
       setSavedSeenItMovieIds((prev) => {
         const updated = [...prev, movieId];
-        saveSeenItMovieIds(updated); // Save to local storage
+        saveSeenItMovieIds(updated);
         return updated;
       });
-      console.log('Movie saved to Seen It:', await response.json());
+      console.log("Successfully marked as Seen from Trending:", movieId);
     } catch (error) {
-      console.error('Error saving movie to Seen It:', error);
+      console.error('Error saving movie to Seen It from Trending:', error);
     }
   };
 
