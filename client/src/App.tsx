@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './App.css';
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import {
   ApolloClient,
   InMemoryCache,
@@ -53,35 +53,24 @@ function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
-        {/* Defined specific Routes and remove the explicit Outlet (for modal element)*/}
+        {/* Defined specific Routes */}
         <Routes>
-  <Route
-    path="/"
-    element={
-      <Landing setShowModal={setShowModal} setActiveTab={setActiveTab} />
-    }
-  />
-  <Route path="/search" element={<SearchMovies />} />
-  <Route path="/trending" element={<Trending />} />
-  <Route path="/lists-next-seen" element={<ListsNextSeen />} />
-  {/* Removing the wildcard route */}
-</Routes>
-
+          {/* Landing page route */}
+          <Route
+            path="/*"
+            element={
+              <Landing setShowModal={setShowModal} setActiveTab={setActiveTab} />
+            }
+          />
+          {/* Other routes */}
+          <Route path="/search" element={<SearchMovies />} />
+          <Route path="/trending" element={<Trending />} />
+          <Route path="/lists-next-seen" element={<ListsNextSeen />} />
+        </Routes>
         <Footer />
       </>
     </ApolloProvider>
   );
 }
 
-
 export default App;
-/*
-<Routes>
-  <Route path="/" element={<Landing />} />
-  <Route path="/search" element={<SearchMovies />} />
-  <Route path="/trending" element={<Trending />} />
-  <Route path="/lists-next-seen" element={<ListsNextSeen />} />
-  <Route path="*" element={<NotFound />} /> {}
-  </Routes>
-
-*/

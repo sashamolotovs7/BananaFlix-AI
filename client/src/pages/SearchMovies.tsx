@@ -1,10 +1,10 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useMutation } from '@apollo/client';
-import { 
+import {
   saveNextUpMovieIds,
   getNextUpMovieIds,
   saveSeenItMovieIds,
-  getSeenItMovieIds
+  getSeenItMovieIds,
 } from '../utils/localStorage';
 import type { Movie } from '../models/Movie';
 import { searchMovies } from '../utils/API';
@@ -28,14 +28,14 @@ const SearchMovies = () => {
   const [saveSeenItMovie] = useMutation(SAVE_SEEN_IT_MOVIE);
 
   useEffect(() => {
-    console.log("Effect triggered, updating local storage:", { savedNextUpMovieIds, savedSeenItMovieIds });
+    console.log('Effect triggered, updating local storage:', { savedNextUpMovieIds, savedSeenItMovieIds });
     saveNextUpMovieIds(savedNextUpMovieIds);
     saveSeenItMovieIds(savedSeenItMovieIds);
   }, [savedNextUpMovieIds, savedSeenItMovieIds]);
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Form submitted with input:", searchInput);
+    console.log('Form submitted with input:', searchInput);
     if (!searchInput) return;
 
     try {
@@ -53,23 +53,22 @@ const SearchMovies = () => {
         releaseDate: movie.release_date,
         voteAverage: movie.vote_average,
         mediaType: 'movie',
-        // Remove category here if not needed or if it's not part of your schema
       }));
 
       setSearchedMovies(movieData);
       setSearchInput('');
     } catch (error) {
-      console.error("Error in handleFormSubmit:", error);
+      console.error('Error in handleFormSubmit:', error);
     }
   };
 
   const handleAddToNextUp = async (movie: Movie) => {
-    console.log("Attempting to add to Next Up:", movie.id, movie.title);
+    console.log('Attempting to add to Next Up:', movie.id, movie.title);
     if (savedNextUpMovieIds.includes(movie.id.toString())) {
-      console.log("Movie already in Next Up:", movie.id);
+      console.log('Movie already in Next Up:', movie.id);
       return;
     }
-  
+
     const details = {
       movieId: movie.id.toString(),
       title: movie.title,
@@ -78,25 +77,25 @@ const SearchMovies = () => {
       releaseDate: movie.releaseDate,
       voteAverage: movie.voteAverage,
       mediaType: movie.mediaType || 'movie',
-      category: "General"  // Add this with a default or fetch from movie if available
+      category: 'next-up',
     };
-  
+
     try {
       await saveNextUpMovie({ variables: { input: details } });
       setSavedNextUpMovieIds([...savedNextUpMovieIds, movie.id.toString()]);
-      console.log("Successfully added movie to Next Up:", movie.id);
+      console.log('Successfully added movie to Next Up:', movie.id);
     } catch (error) {
       console.error('Error saving movie to Next Up:', error);
     }
   };
-  
+
   const handleSaveSeenIt = async (movie: Movie) => {
-    console.log("Attempting to mark as Seen:", movie.id, movie.title);
+    console.log('Attempting to mark as Seen:', movie.id, movie.title);
     if (savedSeenItMovieIds.includes(movie.id.toString())) {
-      console.log("Movie already marked as Seen:", movie.id);
+      console.log('Movie already marked as Seen:', movie.id);
       return;
     }
-  
+
     const details = {
       movieId: movie.id.toString(),
       title: movie.title,
@@ -105,13 +104,13 @@ const SearchMovies = () => {
       releaseDate: movie.releaseDate,
       voteAverage: movie.voteAverage,
       mediaType: movie.mediaType || 'movie',
-      category: "General"  // Add this with a default or fetch from movie if available
+      category: 'seen-it',
     };
-  
+
     try {
       await saveSeenItMovie({ variables: { input: details } });
       setSavedSeenItMovieIds([...savedSeenItMovieIds, movie.id.toString()]);
-      console.log("Successfully marked movie as Seen:", movie.id);
+      console.log('Successfully marked movie as Seen:', movie.id);
     } catch (error) {
       console.error('Error saving movie to Seen It:', error);
     }
@@ -164,31 +163,6 @@ const SearchMovies = () => {
                   </div>
                   <p className="card-text">
                     <small className="rating text-muted">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 32 32"
-                      width="20"
-                      height="20"
-                    >
-                      <path
-                        d="M22.6,10.3c-0.2,4.3-2,8.3-5,11.3c-3.1,3.1-5.8,4.5-9.3,4.9C8.1,26.6,8,26.7,8,26.8c0,0.2,0.1,0.3,0.2,0.3
-                        c4.4,2,8.8,1.1,12.4-2.5c3.7-3.8,4.5-9.6,2.1-14.2C22.6,10.4,22.6,10.3,22.6,10.3z"
-                        fill="#FDDB3A"
-                      />
-                      <path
-                        d="M22.6,8.2c0.2,0,0.3,0,0.4,0l1-3c0.1-0.3,0-0.5-0.1-0.7C23.7,4.2,23.2,4,22.6,4H22l0.4,4.2
-                        C22.5,8.2,22.5,8.2,22.6,8.2z"
-                        fill="#00FF00"
-                      />
-                      <path
-                        d="M25.8,5.9C26.1,5,26,4.1,25.5,3.4C24.9,2.5,23.8,2,22.6,2h-1.1c-0.4,0-0.8,0.2-1.1,0.5C20.1,2.9,19.9,3.4,20,4l0.6,6
-                        c-0.1,3.9-1.6,7.5-4.4,10.2c-2.8,2.8-5.1,4-8.1,4.3c-1.1,0.1-2,0.9-2.1,1.9c-0.2,1,0.4,2,1.3,2.5c1.8,0.8,3.6,1.2,5.4,1.2
-                        c3.3,0,6.6-1.4,9.3-4.1c4.2-4.3,5.3-10.9,2.5-16.2L25.8,5.9z M22.6,4c0.6,0,1.1,0.2,1.3,0.5C24,4.7,24.1,4.9,24,5.2l-1,3
-                        c-0.1,0-0.2,0-0.4,0c-0.1,0-0.1,0-0.2,0L22,4H22.6z M20.6,24.6c-3.6,3.6-8,4.5-12.4,2.5C8.1,27.1,8,27,8,26.8c0-0.1,0.1-0.2,0.3-0.3
-                        c3.5-0.4,6.2-1.8,9.3-4.9c3-3,4.8-7,5-11.3c0,0,0,0.1,0.1,0.1C25.1,15,24.3,20.8,20.6,24.6z"
-                        fill="#231f20"
-                      />
-                    </svg>
                       Rating: {movie.voteAverage.toFixed(1)}/10
                     </small>
                   </p>

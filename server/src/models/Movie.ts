@@ -10,39 +10,34 @@ export interface MovieDocument extends Document {
   category: string; // Either 'next-up' or 'seen-it'
 }
 
-const movieSchema = new Schema<MovieDocument>(
-  {
-    movieId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    overview: {
-      type: String,
-    },
-    posterPath: {
-      type: String,
-    },
-    releaseDate: {
-      type: String,
-    },
-    voteAverage: {
-      type: Number,
-    },
-    category: {
-      type: String,
-      enum: ['next-up', 'seen-it'],
-      required: true,
-    },
+const movieSchema = new Schema<MovieDocument>({
+  movieId: {
+    type: String,
+    required: true,
+    unique: true,
   },
-  {
-    timestamps: true, // This adds 'createdAt' and 'updatedAt' fields automatically
-  }
-);
+  title: {
+    type: String,
+    required: true,
+  },
+  overview: {
+    type: String,
+  },
+  posterPath: {
+    type: String,
+  },
+  releaseDate: {
+    type: String,
+  },
+  voteAverage: {
+    type: Number,
+  },
+  category: {
+    type: String,
+    enum: ['next-up', 'seen-it'], // Only allowed values
+    required: true,
+  },
+});
 
 const Movie = model<MovieDocument>('Movie', movieSchema);
 
