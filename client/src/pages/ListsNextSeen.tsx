@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { GET_USER_MOVIE_LISTS } from '../utils/mutations';
 import './ListsNextSeen.css'; // Ensure this file contains your custom styles
@@ -16,6 +16,9 @@ const ListsNextSeen: React.FC = () => {
   // State to toggle the filter dropdowns
   const [showNextUpFilter, setShowNextUpFilter] = useState<boolean>(false);
   const [showSeenItFilter, setShowSeenItFilter] = useState<boolean>(false);
+
+  // State to manage expanded/collapsed state of movie descriptions
+  const [expanded, setExpanded] = useState<number | null>(null);
 
   // Loading and error handling
   if (loading) return <p>Loading...</p>;
@@ -45,6 +48,14 @@ const ListsNextSeen: React.FC = () => {
     setAppliedSelections(selections); // Update active selections
     setFilter(false); // Collapse the dropdown after applying
   };
+
+  // transferred function to truncate text from SearchMovies.tsx
+  const toggleExpanded = (id: number) => {
+    setExpanded(expanded === id ? null : id);
+  };
+
+  const truncateText = (text: string, length: number) =>
+    text.length > length ? text.substring(0, length) + '...' : text;
 
   return (
     <div className="container-lg py-5">
@@ -99,7 +110,19 @@ const ListsNextSeen: React.FC = () => {
                   />
                   <div className="card-body">
                     <h5 className="card-title">{movie.title}</h5>
-                    <p className="card-text">{movie.overview}</p>
+                    <p className="card-text">
+                      {expanded === movie._id
+                        ? movie.overview
+                        : truncateText(movie.overview, 50)}
+                      {movie.overview.length > 50 && (
+                        <button
+                          className="btn btn-link p-0 read-more"
+                          onClick={() => toggleExpanded(movie._id)}
+                        >
+                          {expanded === movie._id ? 'Show Less' : 'Read More'}
+                        </button>
+                      )}
+                    </p>
                     <div className="text-muted">
                       {movie.releaseDate &&
                         new Date(movie.releaseDate).toLocaleDateString()}
@@ -192,7 +215,20 @@ const ListsNextSeen: React.FC = () => {
                   />
                   <div className="card-body">
                     <h5 className="card-title">{movie.title}</h5>
-                    <p className="card-text">{movie.overview}</p>
+                    {/* limited to 50 characters  */}
+                    <p className="card-text">
+                      {expanded === movie._id
+                        ? movie.overview
+                        : truncateText(movie.overview, 50)}
+                      {movie.overview.length > 50 && (
+                        <button
+                          className="btn btn-link p-0 read-more"
+                          onClick={() => toggleExpanded(movie._id)}
+                        >
+                          {expanded === movie._id ? 'Show Less' : 'Read More'}
+                        </button>
+                      )}
+                    </p>
                     <div className="text-muted">
                       {movie.releaseDate &&
                         new Date(movie.releaseDate).toLocaleDateString()}
