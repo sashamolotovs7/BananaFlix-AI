@@ -20,7 +20,7 @@ The platform integrates TMDB's extensive movie database with modern, user-friend
   <br/>Step 0: TMDB Movie API: https://developer.themoviedb.org/reference/intro/getting-started
   <br/>Step 0: OPENAI API: https://openai.com/index/openai-api/
   <br/>Step 0: MongoDB: https://coding-boot-camp.github.io/full-stack/mongodb/deploy-with-render-and-mongodb-atlas (follow steps to create MONGODB_URI)
-  <br/>Step 1: Navigate to : https://github.com/bmw-dev0p/BananaFlix
+  <br/>Step 1: Navigate to : https://github.com/sashamolotovs7/BananaFlix-AI
   <br/>Step 2: Clone the repo to download it onto your local computer
   <br/>Step 3: Open download in the IDE of your choosing, navigate to the root folder
   <br/>Step 4: Navigate to 'BananaFlix/server/.env.EXAMPLE' , change file name to '.env', fill out the credentials from previous step.
