@@ -1,9 +1,10 @@
 # BananaFlix
-Movie Database - Project 3 
-Created By: Brad Webster, Selena Garcia, Alexander Volkov and Leonardo Reis - in collaboration with edX Coding Bootcamp
+Movie Database - Project 3 (Alexander Volkov version)
+Project Created By: Brad Webster, Selena Garcia, Alexander Volkov and Leonardo Reis - in collaboration with edX Coding Bootcamp
 
 ## Description:
-BananaFlix is a dynamic movie database platform that empowers users to discover, organize, and rate movies effortlessly. Whether you're building a watchlist of must-see films or reviewing your all-time favorites, BananaFlix is designed to make the movie experience fun, interactive, and seamless.
+BananFlix is a mavie application that enables users to discover, browse, organize and rate movies.
+Whether you are building a watchlist of must-see films or reviewing your favorite movies, BananFlix is designed to make the movie experience fun, interactive, and seamless.
 
 The platform integrates TMDB's extensive movie database with modern, user-friendly features. From a curated trending section to personalized lists for "Next Up" and "Seen It", BananaFlix provides tools to enhance your movie journey. Dive into the world of cinema with features like a chat assistant powered by AI and Apollo GraphQL for optimized performance.
 
